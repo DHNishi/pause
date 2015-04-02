@@ -1,0 +1,19 @@
+{
+  "name": "Pomodimer",
+  "version": "0.0.0",
+  "authors": [
+    "dhnishi <dhnishi@gmail.com>"
+  ],
+  "description": "A Pomodoro Chrome App built in Typescript",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "moment": "~2.9.0"
+  }
+}
