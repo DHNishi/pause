@@ -34,3 +34,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
         chrome.runtime.sendMessage({type: "startAlarm", name : "work"});
     }
 });
+
+// TODO: Please add a listener here to allow for the triggering of the notification.
+
+// When stopping an alarm, we need to calculate the time remaining and store it. When we restart, we create a new alarm with
+// this time differential when we start again.
