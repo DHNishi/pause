@@ -1,7 +1,6 @@
 /**
  * Created by dhnishi on 4/1/15.
  */
-
 declare var chrome: any;
 
 chrome.app.runtime.onLaunched.addListener(function() {
@@ -24,4 +23,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     // In order to pull this out, we need to extract the business logic from pomodimer.ts into background.ts.
     // We then need to change the pomodimer code to probably remove the class and just pull data directly from the alarms API.
     console.log("We received an alarm!", alarm);
+    if (alarm.name === "work") {
+        console.log("We were working.");
+        chrome.alarms.create("break", { when: Date.now() + 5000 });
+        chrome.runtime.sendMessage({type: "startAlarm", name : "break"});
+    }
+    else {
+        console.log("We were resting.");
+        chrome.alarms.create("work", { when: Date.now() + 5000 });
+        chrome.runtime.sendMessage({type: "startAlarm", name : "work"});
+    }
 });
