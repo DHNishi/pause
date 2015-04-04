@@ -23,6 +23,7 @@ var Pomotimer = (function () {
             var formatRemaining = moment.utc(_this.timeRemaining.asMilliseconds());
             _this.timeElement.innerText = formatRemaining.format('mm:ss');
         }, oneSecond);
+        chrome.alarms.create("work", { when: Date.now() + 5000 });
     };
     Pomotimer.prototype.beginBreakTime = function (minutes) {
         var _this = this;
@@ -42,6 +43,7 @@ var Pomotimer = (function () {
             var formatRemaining = moment.utc(_this.timeRemaining.asMilliseconds());
             _this.timeElement.innerText = formatRemaining.format('mm:ss');
         }, oneSecond);
+        chrome.alarms.create("break", { when: Date.now() + 5000 });
     };
     Pomotimer.prototype.addTime = function (minutes) {
         this.timeRemaining.add(minutes, "minute");

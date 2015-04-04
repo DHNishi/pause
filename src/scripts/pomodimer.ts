@@ -4,6 +4,8 @@
 
 /// <reference path="../../typings/moment/moment.d.ts" />
 
+declare var chrome : any;
+
 class Pomotimer {
     timeElement : HTMLElement;
     timeRemaining : moment.Duration;
@@ -35,6 +37,7 @@ class Pomotimer {
             var formatRemaining = moment.utc(this.timeRemaining.asMilliseconds());
             this.timeElement.innerText = formatRemaining.format('mm:ss');
         }, oneSecond);
+        chrome.alarms.create("work", {when: Date.now() + 5000});
     }
 
     beginBreakTime(minutes : number) {
@@ -57,6 +60,7 @@ class Pomotimer {
             var formatRemaining = moment.utc(this.timeRemaining.asMilliseconds());
             this.timeElement.innerText = formatRemaining.format('mm:ss');
         }, oneSecond);
+        chrome.alarms.create("break", {when: Date.now() + 5000});
     }
 
     addTime(minutes : number) {
