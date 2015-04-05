@@ -3,12 +3,28 @@ html
     head(lang='en')
         meta(charset="UTF-8")
         title Pomodimer
+        link(rel='stylesheet', href='components/bootstrap-material-design/dist/css/material.css')
+        link(rel='stylesheet', href='css/style.less')
+        script(src='components/jquery/dist/jquery.js')
+        script(src='components/bootstrap-material-design/dist/js/material.js')
+        script(src='components/bootstrap-material-design/dist/js/ripples.js')
         script(src='components/moment/moment.js')
+        script(src='scripts/jquery.nouislider.min.js')
         script(src='scripts/pomodimer.js')
     body
         center
-        div#time 10:00
-        button#startNow Begin Work/Take Break Now
-        button#takeFive Take 5
-        button#takeTen Take 10
-        button#openSettings Open Settings Page
+        h1#time 10:00
+        div#buttons
+            button.btn.btn-default#startNow Begin Work Early
+            button.btn.btn-default#pauseButton Pause
+            button.btn.btn-default.mdi-action-settings#openSettings
+        div#settings
+            div
+                span.sliderHeader Focus Time:
+                span#workMinutes 25 minutes
+            div#workSlider.slider.shor
+            div
+                span.sliderHeader Break Time:
+                span#breakMinutes 5 minutes
+            div#breakSlider.slider.shor
+

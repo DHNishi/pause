@@ -7,15 +7,43 @@ declare var chrome: any;
 var createWindow = () => {
     chrome.app.window.create('window.html', {
         'bounds': {
-            'width': 400,
-            'height': 500
-        }
+            'width': 450,
+            'height': 250
+        },
+        "resizable": false
     });
 };
 
 chrome.app.runtime.onLaunched.addListener(function() {
     createWindow();
 });
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request === "scheduleWork") {
+        scheduleAlarm("work");
+    }
+    else if (request === "scheduleBreak") {
+        scheduleAlarm("break");
+    }
+});
+
+var scheduleAlarm = (alarmType, timeOverride?) => {
+    chrome.alarms.clearAll();
+    if (timeOverride === undefined) {
+        chrome.storage.sync.get('times', (data) => {
+                var alarmTime = (alarmType === "work") ? 25 : 5;
+                var myData = data['times'];
+                if (myData !== undefined && myData[alarmType] !== undefined) {
+                    alarmTime = myData[alarmType];
+                }
+                chrome.alarms.create(alarmType, { when: Date.now() + 1000 * 60 * alarmTime});
+            }
+        );
+    }
+    else {
+        chrome.alarms.create(alarmType, { when: Date.now() + 1000 * 60 * timeOverride});
+    }
+};
 
 chrome.alarms.onAlarm.addListener(alarm => {
     console.log("We received an alarm!", alarm);
@@ -33,13 +61,13 @@ chrome.alarms.onAlarm.addListener(alarm => {
                 console.log("Triggered break notification.", notificationId);
             });
         });
-        chrome.alarms.create("break", { when: Date.now() + 5000 });
+        scheduleAlarm('break');
     }
     else {
-        chrome.alarms.create("work", { when: Date.now() + 5000 });
+        scheduleAlarm('work');
         var workMessage = {
             type: 'basic',
-            title: 'Time for a work!',
+            title: 'Time for work!',
             message: 'Your break time has ended.',
             iconUrl: 'timer-512.png'
         };
@@ -48,6 +76,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
                 console.log("Triggered break notification.", notificationId);
             });
         });
+        scheduleAlarm('work');
     }
 });
 
@@ -57,10 +86,7 @@ chrome.notifications.onButtonClicked.addListener((notificationId : string, butto
         var SKIP_BREAK = 0;
         // var TAKE_10 = 1;
 
-        chrome.alarms.clearAll();
-        var postponeTime = buttonIndex === SKIP_BREAK ? Date.now() + 5000 : Date.now() + 10 * 6000;
-        chrome.alarms.create("work", { when: postponeTime });
-
+        scheduleAlarm('work', 10);
     }
 });
 

@@ -5,6 +5,7 @@
 /// <reference path="../../typings/moment/moment.d.ts" />
 
 declare var chrome : any;
+declare var $ : any;
 
 class Pomotimer {
     timeElement : HTMLElement;
@@ -34,16 +35,15 @@ class Pomotimer {
     startNextNow() {
         chrome.alarms.getAll((alarmArray : any[]) =>
         {
-            chrome.alarms.clearAll();
              if (alarmArray.length > 0) {
                  var currentAlarm = alarmArray[0];
                  if (currentAlarm.name === "work") {
-                     chrome.alarms.create("break", { when: Date.now() + 5000 });
+                     chrome.runtime.sendMessage('scheduleBreak');
                      return;
                  }
              }
              // Start work.
-            chrome.alarms.create("work", { when: Date.now() + 5000 });
+            chrome.runtime.sendMessage('scheduleWork');
         });
     }
 
@@ -60,18 +60,76 @@ class Pomotimer {
     }
 }
 
-window.onload = function() {
+var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 250;
+var WINDOW_HEIGHT_SETTINGS_VISIBLE = 350;
+
+var showSettingsPage = () => {
+    $('#settings').toggle();
+    var currentWindowBounds = chrome.app.window.current().innerBounds;
+    if (currentWindowBounds.height === WINDOW_HEIGHT_SETTINGS_VISIBLE) {
+        currentWindowBounds.height = WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE;
+    }
+    else {
+        currentWindowBounds.height = WINDOW_HEIGHT_SETTINGS_VISIBLE;
+    }
+};
+
+var initializeSliders = () => {
+    var workSlider = $('#workSlider');
+    workSlider.noUiSlider({
+        start: 25,
+        connect: "lower",
+        range: {
+            min: 5,
+            max: 120
+        }
+    });
+    workSlider.on({
+        change: () => setSliderMinutes("work")
+    });
+
+
+    var breakSlider = $('#breakSlider');
+    breakSlider.noUiSlider({
+        start: 5,
+        connect: "lower",
+        range: {
+            min: 3,
+            max: 60
+        }
+    });
+    breakSlider.on({
+        change: () => setSliderMinutes("break")
+    });
+}
+
+var setSliderMinutes = (sliderType) => {
+    var minutes : number = $('#' + sliderType + 'Slider').val();
+    minutes = Math.floor(minutes);
+    $('#' + sliderType + 'Minutes').text(minutes + " minutes");
+
+    var times = chrome.storage.sync.get('times', (data) => {
+        var myData = data['times'];
+        if (myData === undefined) {
+            data['times'] = {};
+        }
+        data['times'][sliderType] = minutes;
+        chrome.storage.sync.set({times: data['times']}, () => {
+            console.log(sliderType, " minutes changed to " + minutes);
+        });
+    });
+};
+
+window.onload = () => {
+    $.material.init();
+
     var myTimer = new Pomotimer(document.getElementById('time'));
-
-    document.getElementById('takeFive').onclick = () => {
-        myTimer.addTime(5);
-    };
-
-    document.getElementById('takeTen').onclick = () => {
-        myTimer.addTime(10);
-    };
 
     document.getElementById('startNow').onclick = () => {
         myTimer.startNextNow();
     };
+
+    document.getElementById('openSettings').onclick = showSettingsPage;
+
+    initializeSliders();
 };
