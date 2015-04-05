@@ -14,6 +14,39 @@ var createWindow = () => {
             'height': 250
         },
         "resizable": false
+    }, (appWindow) => {
+        appWindow.onClosed.addListener(() => {
+            chrome.storage.sync.get('remindOnClose', (data) => {
+                console.log(data);
+                var remindOnClose = data['remindOnClose'];
+                if (remindOnClose === undefined || remindOnClose) {
+                    remindRunningAlarmsNotification();
+                }
+            });
+            chrome.storage.sync.get('clearAlarmsOnClose', (data) => {
+                console.log(data);
+                var clearAlarms = data['clearAlarmsOnClose'];
+                if (clearAlarms === undefined || clearAlarms) {
+                    chrome.alarms.clearAll();
+                }
+            });
+        });
+    });
+};
+
+var remindRunningAlarmsNotification = () => {
+    var options = {
+        type: 'basic',
+        title: 'pause is still running in the background.',
+        message: 'Your work time has ended.',
+        buttons: [{title: "Don't remind me again"}, {title: "Don't run alarms after closing pause."}],
+        iconUrl: 'timer-512.png'
+    };
+
+    chrome.notifications.clear("onClose", (wasCleared) => {
+        chrome.notifications.create("onClose", options, (notificationId) => {
+            console.log("Triggered close notification.", notificationId);
+        });
     });
 };
 
@@ -93,6 +126,17 @@ chrome.notifications.onButtonClicked.addListener((notificationId : string, butto
         // var TAKE_10 = 1;
 
         scheduleAlarm('work', 10);
+    }
+    else if (notificationId === "onClose") {
+        var DONT_REMIND_ME_AGAIN = 0;
+        var DONT_RUN_ALARMS = 1;
+
+        if (buttonIndex === DONT_REMIND_ME_AGAIN) {
+            chrome.storage.sync.set({remindOnClose: false});
+        }
+        else {
+            chrome.storage.sync.set({clearAlarmsOnClose: true});
+        }
     }
 });
 
