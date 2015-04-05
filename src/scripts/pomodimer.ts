@@ -8,22 +8,27 @@ declare var chrome : any;
 
 class Pomotimer {
     timeElement : HTMLElement;
-    beginNextCycle : boolean;
-
     countdownCycle : number;
-
-    // TODO(dhnishi): Please add getters and setters for changing the break and work times.
 
     constructor(_timeElement) {
         this.timeElement = _timeElement;
-        chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
-                console.log("received message");
-                if (message.type === 'startAlarm') {
-                    this.onStartAlarm(message.name);
+
+        var oneSecond = 1000;
+        setInterval(() => {
+            chrome.alarms.getAll((alarms : any[]) =>
+            {
+                if (alarms.length === 0) {
+                    return;
                 }
-            }
-        );
-        chrome.alarms.onAlarm.addListener(this.onAlarmEnd);
+                var alarm = alarms[0];
+
+                console.log("checking time");
+                var now = moment();
+                var alarmTime = moment(alarm.scheduledTime);
+                var timeRemaining = moment.duration((alarmTime.diff(now)));
+                this.timeElement.innerText = moment.utc(timeRemaining.asMilliseconds()).format('mm:ss');
+            });
+        }, oneSecond);
     }
 
     /* TODO(dhnishi): Need to refactor this code to do the following things.
@@ -39,6 +44,7 @@ class Pomotimer {
     // If the alarm no longer exists, kill the callback.
 
     onStartAlarm(alarmName) {
+        console.log("Starting ", alarmName);
         var oneSecond = 1000 // ms
         var countdownCycle = setInterval(() => {
             chrome.alarms.get(alarmName, (alarm) =>
@@ -48,6 +54,7 @@ class Pomotimer {
                     clearInterval(countdownCycle);
                     return;
                 }
+
                 console.log("checking time");
                 var now = moment();
                 var alarmTime = moment(alarm.scheduledTime);
@@ -61,13 +68,37 @@ class Pomotimer {
         console.log(alarm.name + " has triggered.");
     }
 
-    addTime(minutes : number) {
-        console.log("TBD");
-        //this.timeRemaining.add(minutes, "minute");
+    startNextNow() {
+        chrome.alarms.getAll((alarmArray : any[]) =>
+        {
+            chrome.alarms.clearAll();
+             if (alarmArray.length > 0) {
+                 var currentAlarm = alarmArray[0];
+                 if (currentAlarm.name === "work") {
+                     chrome.alarms.create("break", { when: Date.now() + 5000 });
+                     chrome.runtime.sendMessage({type: "startAlarm", name : "break"});
+                     return;
+                 }
+             }
+             // Start work.
+            chrome.alarms.create("work", { when: Date.now() + 5000 });
+            chrome.runtime.sendMessage({type: "startAlarm", name : "work"});
+            return;
+        });
+
     }
 
-    zeroRemaining() {
-        this.beginNextCycle = true;
+    addTime(minutes : number) {
+        chrome.alarms.getAll((alarmArray : any[]) =>
+        {
+            if (alarmArray.length > 0) {
+                var currentAlarm = alarmArray[0];
+                var currentAlarmName = currentAlarm.name;
+                var nextAlarmTime = moment(currentAlarm.scheduledTime).add(minutes, "minute");
+                chrome.alarms.create(currentAlarmName, { when: nextAlarmTime.unix() * 1000});
+            }
+        });
+        //this.timeRemaining.add(minutes, "minute");
     }
 }
 
@@ -88,9 +119,6 @@ window.onload = function() {
     };
 
     document.getElementById('startNow').onclick = () => {
-        //myTimer.zeroRemaining();
-        chrome.alarms.create("work", { when: Date.now() + 5000 });
-        chrome.runtime.sendMessage({type: "startAlarm", name : "work"});
-        //myTimer.beginWorkTime(1);
+        myTimer.startNextNow();
     };
 }

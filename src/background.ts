@@ -1,6 +1,9 @@
 /**
  * Created by dhnishi on 4/1/15.
  */
+
+/// <reference path="scripts/pomodimer.ts" />
+
 declare var chrome: any;
 
 chrome.app.runtime.onLaunched.addListener(function() {
@@ -24,14 +27,65 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     // We then need to change the pomodimer code to probably remove the class and just pull data directly from the alarms API.
     console.log("We received an alarm!", alarm);
     if (alarm.name === "work") {
-        console.log("We were working.");
+        console.log("RING RING: Work time is over!");
+        var options = {
+            type: 'basic',
+            title: 'Time for a break!',
+            message: 'Your work time has ended.',
+            buttons: [{ title: "Skip break" }, { title: "Postpone 10 minutes"}],
+            iconUrl: 'timer-512.png'
+        };
+        chrome.notifications.clear("breakTime", (wasCleared) => {
+            chrome.notifications.create("breakTime", options, (notificationId) => {
+                console.log("Triggered break notification.", notificationId);
+            });
+        });
         chrome.alarms.create("break", { when: Date.now() + 5000 });
-        chrome.runtime.sendMessage({type: "startAlarm", name : "break"});
     }
     else {
-        console.log("We were resting.");
         chrome.alarms.create("work", { when: Date.now() + 5000 });
-        chrome.runtime.sendMessage({type: "startAlarm", name : "work"});
+        var workMessage = {
+            type: 'basic',
+            title: 'Time for a work!',
+            message: 'Your break time has ended.',
+            iconUrl: 'timer-512.png'
+        };
+        chrome.notifications.clear("workTime", (wasCleared) => {
+            chrome.notifications.create("workTime", workMessage, (notificationId) => {
+                console.log("Triggered break notification.", notificationId);
+            });
+        });
+    }
+});
+
+chrome.notifications.onButtonClicked.addListener((notificationId : string, buttonIndex : number) =>
+{
+    if (notificationId === "breakTime") {
+        var SKIP_BREAK = 0;
+        // var TAKE_10 = 1;
+        if (buttonIndex === SKIP_BREAK) {
+            chrome.alarms.clearAll();
+            chrome.alarms.create("work", { when: Date.now() + 5000 });
+        }
+        else {
+            chrome.alarms.clearAll();
+            chrome.alarms.create("work", { when: Date.now() + 10 * 5000 });
+        }
+    }
+});
+
+chrome.notifications.onClicked.addListener((notificationId) => {
+    var appWindows = chrome.app.window.getAll();
+    if (appWindows.length > 0) {
+        appWindows[0].show();
+    }
+    else {
+        chrome.app.window.create('window.html', {
+            'bounds': {
+                'width': 400,
+                'height': 500
+            }
+        });
     }
 });
 
