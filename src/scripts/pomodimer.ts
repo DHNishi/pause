@@ -23,6 +23,13 @@ class Pomotimer {
                 }
                 var alarm = alarms[0];
 
+                if (alarm.name === "work") {
+                    $('#startNow').text("Begin Break Early");
+                }
+                else {
+                    $('#startNow').text("Begin Work Early");
+                }
+
                 console.log("checking time");
                 var now = moment();
                 var alarmTime = moment(alarm.scheduledTime);
@@ -75,33 +82,48 @@ var showSettingsPage = () => {
 };
 
 var initializeSliders = () => {
-    var workSlider = $('#workSlider');
-    workSlider.noUiSlider({
-        start: 25,
-        connect: "lower",
-        range: {
-            min: 5,
-            max: 120
-        }
-    });
-    workSlider.on({
-        change: () => setSliderMinutes("work")
-    });
+    chrome.storage.sync.get('times', (data) => {
+            var timeData = data['times'];
+            if (timeData === undefined) {
+                timeData = { 'work': 30, 'break': 10 };
+            }
 
-
-    var breakSlider = $('#breakSlider');
-    breakSlider.noUiSlider({
-        start: 5,
-        connect: "lower",
-        range: {
-            min: 3,
-            max: 60
+            var workMinutes = 25;
+            if (timeData !== undefined && timeData['work'] !== undefined) {
+                workMinutes = timeData['work'];
+            }
+            var workSlider = $('#workSlider');
+            workSlider.noUiSlider({
+                start: workMinutes,
+                range: {
+                    min: 5,
+                    max: 120
+                }
+            });
+            workSlider.on({
+                change: () => setSliderMinutes("work")
+            });
+            $('#workMinutes').text(workMinutes + " minutes");
+            
+            var breakMinutes = 5;
+            if (timeData !== undefined && timeData['break'] !== undefined) {
+                breakMinutes = timeData['break'];
+            }
+            var breakSlider = $('#breakSlider');
+            breakSlider.noUiSlider({
+                start: breakMinutes,
+                range: {
+                    min: 3,
+                    max: 60
+                }
+            });
+            breakSlider.on({
+                change: () => setSliderMinutes("break")
+            });
+            $('#breakMinutes').text(breakMinutes + " minutes");
         }
-    });
-    breakSlider.on({
-        change: () => setSliderMinutes("break")
-    });
-}
+    );
+};
 
 var setSliderMinutes = (sliderType) => {
     var minutes : number = $('#' + sliderType + 'Slider').val();
