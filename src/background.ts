@@ -17,7 +17,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
     createWindow();
 });
 
-chrome.alarms.onAlarm.addListener((alarm) => {
+chrome.alarms.onAlarm.addListener(alarm => {
     console.log("We received an alarm!", alarm);
     if (alarm.name === "work") {
         console.log("RING RING: Work time is over!");
@@ -64,7 +64,7 @@ chrome.notifications.onButtonClicked.addListener((notificationId : string, butto
     }
 });
 
-chrome.notifications.onClicked.addListener((notificationId) => {
+chrome.notifications.onClicked.addListener(notificationId => {
     var appWindows = chrome.app.window.getAll();
     if (appWindows.length > 0) {
         appWindows[0].show();

@@ -1,11 +1,12 @@
 {
-  "name": "Hello World!",
-  "description": "My first Chrome App.",
+  "name": "pause",
+  "description": "pause is a time manager which tells you when to focus and when to take a break.",
   "version": "0.1",
   "manifest_version": 2,
   "app": {
     "background": {
-      "scripts": ["background.js"]
+      "scripts": ["background.js"],
+      "persistent": false
     }
   },
   "permissions":
