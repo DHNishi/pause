@@ -18,3 +18,19 @@
 #settings {
   display: none;
 }
+.checkboxText {
+  display: inline-block;
+  margin-left: 5px;
+  height: 24px;
+  vertical-align: middle;
+}
+.togglebutton {
+  height: 25px;
+  margin-bottom: 4px;
+}
+.togglebutton label {
+  vertical-align: middle;
+}
+.toggle {
+  float: right;
+}

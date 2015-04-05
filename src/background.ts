@@ -134,8 +134,9 @@ chrome.notifications.onButtonClicked.addListener((notificationId : string, butto
         if (buttonIndex === DONT_REMIND_ME_AGAIN) {
             chrome.storage.sync.set({remindOnClose: false});
         }
-        else {
+        else { // Don't run alarms.
             chrome.storage.sync.set({clearAlarmsOnClose: true});
+            chrome.alarms.clearAll();
         }
     }
 });

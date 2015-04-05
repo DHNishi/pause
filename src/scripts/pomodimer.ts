@@ -57,17 +57,33 @@ class Pomotimer {
 }
 
 var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 250;
-var WINDOW_HEIGHT_SETTINGS_VISIBLE = 350;
+var WINDOW_HEIGHT_SETTINGS_VISIBLE = 400;
 
 var showSettingsPage = () => {
-    $('#settings').toggle();
-    var currentWindowBounds = chrome.app.window.current().innerBounds;
-    if (currentWindowBounds.height === WINDOW_HEIGHT_SETTINGS_VISIBLE) {
-        currentWindowBounds.height = WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE;
-    }
-    else {
-        currentWindowBounds.height = WINDOW_HEIGHT_SETTINGS_VISIBLE;
-    }
+    chrome.storage.sync.get(['remindOnClose', 'clearAlarmsOnClose'], (data) => {
+        var remindOnClose = data['remindOnClose'];
+        remindOnClose = (remindOnClose === undefined) ? true : remindOnClose;
+        $('#remindAlarmsCheckbox').prop('checked', remindOnClose);
+        $('#remindAlarmsCheckbox').click(() => {
+            chrome.storage.sync.set({remindOnClose: $('#remindAlarmsCheckbox')[0].checked});
+        });
+
+        var clearAlarms = data['clearAlarmsOnClose'];
+        clearAlarms = (clearAlarms === undefined) ? false : clearAlarms;
+        $('#clearAlarmsCheckbox').prop('checked', clearAlarms);
+        $('#clearAlarmsCheckbox').click(() => {
+            chrome.storage.sync.set({clearAlarmsOnClose: $('#clearAlarmsCheckbox')[0].checked});
+        });
+
+        $('#settings').toggle();
+        var currentWindowBounds = chrome.app.window.current().innerBounds;
+        if (currentWindowBounds.height === WINDOW_HEIGHT_SETTINGS_VISIBLE) {
+            currentWindowBounds.height = WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE;
+        }
+        else {
+            currentWindowBounds.height = WINDOW_HEIGHT_SETTINGS_VISIBLE;
+        }
+    });
 };
 
 var initializeSliders = () => {

@@ -4,7 +4,7 @@ html
         meta(charset="UTF-8")
         title Pomodimer
         link(rel='stylesheet', href='components/bootstrap-material-design/dist/css/material.css')
-        link(rel='stylesheet', href='css/style.less')
+        link(rel='stylesheet', href='css/style.css')
         script(src='components/jquery/dist/jquery.js')
         script(src='components/bootstrap-material-design/dist/js/material.js')
         script(src='components/bootstrap-material-design/dist/js/ripples.js')
@@ -27,5 +27,10 @@ html
                 span.sliderHeader Break Time:
                 span#breakMinutes 5 minutes
             div#breakSlider.slider.shor
-            // TODO: Add checkboxes for remindOnClose and clearAlarmsOnClose.
+            div.togglebutton
+                    label Remind me about alarms when closing.
+                        input#remindAlarmsCheckbox(type="checkbox")
+            div.togglebutton
+                label Clear alarms when closing.
+                    input#clearAlarmsCheckbox(type="checkbox")
 
