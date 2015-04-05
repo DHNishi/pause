@@ -54,17 +54,6 @@ class Pomotimer {
         });
     }
 
-    addTime(minutes : number) {
-        chrome.alarms.getAll((alarmArray : any[]) =>
-        {
-            if (alarmArray.length > 0) {
-                var currentAlarm = alarmArray[0];
-                var currentAlarmName = currentAlarm.name;
-                var nextAlarmTime = moment(currentAlarm.scheduledTime).add(minutes, "minute");
-                chrome.alarms.create(currentAlarmName, { when: nextAlarmTime.unix() * 1000});
-            }
-        });
-    }
 }
 
 var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 250;
@@ -104,7 +93,7 @@ var initializeSliders = () => {
                 change: () => setSliderMinutes("work")
             });
             $('#workMinutes').text(workMinutes + " minutes");
-            
+
             var breakMinutes = 5;
             if (timeData !== undefined && timeData['break'] !== undefined) {
                 breakMinutes = timeData['break'];
@@ -142,6 +131,57 @@ var setSliderMinutes = (sliderType) => {
     });
 };
 
+var pauseAlarm = () => {
+    console.log('pause');
+    chrome.alarms.getAll((alarmArray : any[]) =>
+    {
+        if (alarmArray.length > 0) {
+            var currentAlarm = alarmArray[0];
+            var currentAlarmName = currentAlarm.name;
+            var nextAlarmTime = moment.duration(moment(currentAlarm.scheduledTime).diff(moment()));
+
+            var storedAlarm = {
+                name: currentAlarmName,
+                duration: nextAlarmTime.asSeconds()
+            };
+
+            chrome.alarms.clearAll();
+            chrome.storage.local.set({ storedAlarm: storedAlarm });
+            $('#startNow').prop("disabled", true);
+            $('#pauseButton').text("Unpause");
+        }
+    });
+};
+
+var unpauseAlarm = () => {
+    console.log('unpause');
+    chrome.storage.local.get('storedAlarm', (data) =>
+    {
+        var storedAlarm = data['storedAlarm'];
+        if (storedAlarm === undefined) {
+            return;
+        }
+        chrome.runtime.sendMessage({
+            message: 'scheduleAlarm',
+            type: storedAlarm.name,
+            duration: storedAlarm.duration
+        })
+        $('#startNow').prop("disabled", false);
+        $('#pauseButton').text("Pause");
+    });
+};
+
+var maybePauseAlarm = () => {
+    chrome.alarms.getAll((alarmArray : any[]) => {
+        if (alarmArray.length > 0) {
+            pauseAlarm();
+        }
+        else {
+            unpauseAlarm();
+        }
+    });
+};
+
 window.onload = () => {
     $.material.init();
 
@@ -152,6 +192,8 @@ window.onload = () => {
     };
 
     document.getElementById('openSettings').onclick = showSettingsPage;
+
+    document.getElementById('pauseButton').onclick = maybePauseAlarm;
 
     initializeSliders();
 };

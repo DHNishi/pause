@@ -4,10 +4,13 @@
 
 declare var chrome: any;
 
+chrome.storage.local.remove('storedAlarm');
+chrome.alarms.clearAll();
+
 var createWindow = () => {
     chrome.app.window.create('window.html', {
         'bounds': {
-            'width': 450,
+            'width': 500,
             'height': 250
         },
         "resizable": false
@@ -25,6 +28,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     else if (request === "scheduleBreak") {
         scheduleAlarm("break");
     }
+    else if (request.message === "scheduleAlarm") {
+        scheduleAlarm(request.type, request.duration);
+    }
 });
 
 var scheduleAlarm = (alarmType, timeOverride?) => {
@@ -41,7 +47,7 @@ var scheduleAlarm = (alarmType, timeOverride?) => {
         );
     }
     else {
-        chrome.alarms.create(alarmType, { when: Date.now() + 1000 * 60 * timeOverride});
+        chrome.alarms.create(alarmType, { when: Date.now() + 1000 * timeOverride});
     }
 };
 
