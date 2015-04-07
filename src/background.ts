@@ -42,12 +42,13 @@ var createDisruptor = () => {
             },
             "resizable": false
         }), (appWindow) => {
+            appWindow.maximize();
         };
     }
     else {
         disruptorWindow.show();
     }
-}
+};
 
 var remindRunningAlarmsNotification = () => {
     var options = {
