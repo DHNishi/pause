@@ -34,3 +34,10 @@
 .toggle {
   float: right;
 }
+#break-title {
+  text-align: center;
+}
+#small-time {
+  text-align: center;
+  font-size: 12px;
+}

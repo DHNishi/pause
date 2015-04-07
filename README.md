@@ -9,6 +9,7 @@ The planned features of this app are as follows:
 3. When I am notified of my work time being up, I am given the option to either take a break, postpone the break, or skip the break. (Done)
 4. I can change the duration of my work focus time and my break time. (Done.)
 5. Change out the assets to be my own assets. (In-progress).
+6. Create a disruption window feature. If the break strikes, put up a disruption window that is alwaysOnTop. The disruption window has options to skip the break, take 5, or take 10. Closing it skips the break.
 
 The stretch features of this app are as follows:
 

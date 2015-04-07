@@ -5,7 +5,6 @@
 declare var chrome: any;
 
 chrome.storage.local.remove('storedAlarm');
-chrome.alarms.clearAll();
 
 var createWindow = () => {
     chrome.app.window.create('window.html', {
@@ -24,13 +23,31 @@ var createWindow = () => {
             });
             chrome.storage.sync.get('clearAlarmsOnClose', (data) => {
                 var clearAlarms = data['clearAlarmsOnClose'];
-                if (clearAlarms === undefined || clearAlarms) {
+                if (clearAlarms) {
                     chrome.alarms.clearAll();
                 }
             });
         });
     });
 };
+
+var createDisruptor = () => {
+    var disruptorWindow = chrome.app.window.get('disruptor');
+    if (disruptorWindow === null) {
+        chrome.app.window.create('disruptor.html', {
+            id: "disruptor",
+            'bounds': {
+                'width': 750,
+                'height': 250
+            },
+            "resizable": false
+        }), (appWindow) => {
+        };
+    }
+    else {
+        disruptorWindow.show();
+    }
+}
 
 var remindRunningAlarmsNotification = () => {
     var options = {
@@ -66,6 +83,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 var scheduleAlarm = (alarmType, timeOverride?) => {
     chrome.alarms.clearAll();
+
+    if (alarmType === "break") {
+        createDisruptor();
+    }
+    else {
+        var disruptorWindow = chrome.app.window.get('disruptor');
+        if (disruptorWindow != null) {
+            disruptorWindow.close();
+        }
+    }
+
     if (timeOverride === undefined) {
         chrome.storage.sync.get('times', (data) => {
                 var alarmTime = (alarmType === "work") ? 25 : 5;
