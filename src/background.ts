@@ -17,14 +17,12 @@ var createWindow = () => {
     }, (appWindow) => {
         appWindow.onClosed.addListener(() => {
             chrome.storage.sync.get('remindOnClose', (data) => {
-                console.log(data);
                 var remindOnClose = data['remindOnClose'];
                 if (remindOnClose === undefined || remindOnClose) {
                     remindRunningAlarmsNotification();
                 }
             });
             chrome.storage.sync.get('clearAlarmsOnClose', (data) => {
-                console.log(data);
                 var clearAlarms = data['clearAlarmsOnClose'];
                 if (clearAlarms === undefined || clearAlarms) {
                     chrome.alarms.clearAll();
@@ -38,7 +36,7 @@ var remindRunningAlarmsNotification = () => {
     var options = {
         type: 'basic',
         title: 'pause is still running in the background.',
-        message: 'Your work time has ended.',
+        message: 'Your work/break reminders will continue to fire.',
         buttons: [{title: "Don't remind me again"}, {title: "Don't run alarms after closing pause."}],
         iconUrl: 'timer-512.png'
     };
@@ -125,7 +123,12 @@ chrome.notifications.onButtonClicked.addListener((notificationId : string, butto
         var SKIP_BREAK = 0;
         // var TAKE_10 = 1;
 
-        scheduleAlarm('work', 10);
+        if (buttonIndex === SKIP_BREAK) {
+            scheduleAlarm('work');
+        }
+        else {
+            scheduleAlarm('work', 10);
+        }
     }
     else if (notificationId === "onClose") {
         var DONT_REMIND_ME_AGAIN = 0;
@@ -143,13 +146,10 @@ chrome.notifications.onButtonClicked.addListener((notificationId : string, butto
 
 chrome.notifications.onClicked.addListener(notificationId => {
     var appWindows = chrome.app.window.getAll();
-    if (appWindows.length > 0) {
+    if (appWindows.length) {
         appWindows[0].show();
     }
     else {
         createWindow();
     }
 });
-
-// When stopping an alarm, we need to calculate the time remaining and store it. When we restart, we create a new alarm with
-// this time differential when we start again.

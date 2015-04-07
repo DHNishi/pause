@@ -42,7 +42,7 @@ class Pomotimer {
     startNextNow() {
         chrome.alarms.getAll((alarmArray : any[]) =>
         {
-             if (alarmArray.length > 0) {
+             if (alarmArray.length) {
                  var currentAlarm = alarmArray[0];
                  if (currentAlarm.name === "work") {
                      chrome.runtime.sendMessage('scheduleBreak');
@@ -151,7 +151,7 @@ var pauseAlarm = () => {
     console.log('pause');
     chrome.alarms.getAll((alarmArray : any[]) =>
     {
-        if (alarmArray.length > 0) {
+        if (alarmArray.length) {
             var currentAlarm = alarmArray[0];
             var currentAlarmName = currentAlarm.name;
             var nextAlarmTime = moment.duration(moment(currentAlarm.scheduledTime).diff(moment()));
