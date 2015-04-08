@@ -6,6 +6,8 @@ declare var chrome: any;
 
 chrome.storage.local.remove('storedAlarm');
 
+var lastDuration = null;
+
 var createWindow = () => {
     chrome.app.window.create('window.html', {
         'bounds': {
@@ -103,11 +105,13 @@ var scheduleAlarm = (alarmType, timeOverride?) => {
                     alarmTime = myData[alarmType];
                 }
                 chrome.alarms.create(alarmType, { when: Date.now() + 1000 * 60 * alarmTime});
+                lastDuration = alarmTime * 60;
             }
         );
     }
     else {
         chrome.alarms.create(alarmType, { when: Date.now() + 1000 * timeOverride});
+        lastDuration = timeOverride;
     }
 };
 

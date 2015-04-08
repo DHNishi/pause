@@ -7,7 +7,7 @@
 window.onload = () => {
     $.material.init();
 
-    var myTimer = new Pomotimer(document.getElementById('small-time'));
+    var myTimer = new Pomotimer(document.getElementById('small-time'), true);
 
     document.getElementById('skip-break').onclick = () => {
         myTimer.startNextNow();
@@ -28,4 +28,36 @@ window.onload = () => {
             duration: 10 * 60
         });
     };
+
+    var updateTimes = () =>
+    {
+        chrome.alarms.getAll( (alarms) => {
+            if (alarms.length === 0) {
+                return;
+            }
+            var alarm = alarms[0];
+            var now = moment();
+            var alarmTime = moment(alarm.scheduledTime);
+            var timeRemaining = moment.duration((alarmTime.diff(now)));
+
+            if (alarmDuration !== undefined) {
+                var percentDone = 100 - timeRemaining.asSeconds() / alarmDuration.asSeconds() * 100;
+                document.getElementById('time-progress-bar').style.width = "" + percentDone + "%";
+            }
+        }
+    };
+    var alarmDuration : moment.Duration = undefined ;
+    chrome.runtime.getBackgroundPage((backgroundPage) => {
+        console.log(backgroundPage.lastDuration);
+        alarmDuration = moment.duration(backgroundPage.lastDuration, "seconds");
+        document.getElementById('end-time').innerText = moment.utc(alarmDuration.asMilliseconds()).format('mm:ss');
+        updateTimes();
+    });
+
+
+    var oneSecond = 1000;
+
+    setInterval(() => {
+        updateTimes();
+    }, oneSecond);
 };

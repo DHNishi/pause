@@ -10,8 +10,9 @@ declare var $ : any;
 class Pomotimer {
     timeElement : HTMLElement;
     countdownCycle : number;
+    secondsLeft: number;
 
-    constructor(_timeElement = null) {
+    constructor(_timeElement = null, reversed = false) {
         this.timeElement = _timeElement;
 
         var oneSecond = 1000;
@@ -34,8 +35,21 @@ class Pomotimer {
                 var now = moment();
                 var alarmTime = moment(alarm.scheduledTime);
                 var timeRemaining = moment.duration((alarmTime.diff(now)));
-                if (this.timeElement) {
-                    this.timeElement.innerText = moment.utc(timeRemaining.asMilliseconds()).format('mm:ss');
+
+                if (reversed) {
+                    chrome.runtime.getBackgroundPage( (backgroundPage) => {
+                        var alarmDuration = moment.duration(backgroundPage.lastDuration, "seconds");
+                        alarmDuration = alarmDuration.subtract(timeRemaining);
+                        if (this.timeElement) {
+                            this.timeElement.innerText = moment.utc(alarmDuration.asMilliseconds()).format('mm:ss');
+                        }
+                    });
+                }
+                else {
+                    this.secondsLeft = timeRemaining.asSeconds();
+                    if (this.timeElement) {
+                        this.timeElement.innerText = moment.utc(timeRemaining.asMilliseconds()).format('mm:ss');
+                    }
                 }
             });
         }, oneSecond);
