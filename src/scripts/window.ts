@@ -95,7 +95,7 @@ var setSliderMinutes = (sliderType) => {
     });
 };
 
-var pauseAlarm = () => {
+var pauseAlarm = (pauseHoursDuration?) => {
     console.log('pause');
     chrome.alarms.getAll((alarmArray : any[]) =>
     {
@@ -111,33 +111,47 @@ var pauseAlarm = () => {
 
             chrome.alarms.clearAll();
             chrome.storage.local.set({ storedAlarm: storedAlarm });
-            $('#startNow').prop("disabled", true);
-            $('#pauseButton').text("Unpause");
+            startAPause();
+
+            // Set up a potential unpause time in the future.
+            if (pauseHoursDuration) {
+                chrome.alarms.create("restoreAlarm",
+                    {
+                         when: Date.now() + 1000 * 60 * 60 * pauseHoursDuration
+                    });
+            }
         }
     });
 };
 
+function startAPause() {
+    $('#startNow').prop("disabled", true);
+    $('#pauseButton').text("Unpause");
+    $('#time').addClass('paused').text('Paused');
+}
+
+function comingBackFromAPause() {
+    $('#startNow').prop("disabled", false);
+    $('#pauseButton').text("Pause");
+    $('#time').removeClass('paused');
+}
+
 var unpauseAlarm = () => {
-    console.log('unpause');
-    chrome.storage.local.get('storedAlarm', (data) =>
-    {
-        var storedAlarm = data['storedAlarm'];
-        if (storedAlarm === undefined) {
-            return;
-        }
-        chrome.runtime.sendMessage({
-            message: 'scheduleAlarm',
-            type: storedAlarm.name,
-            duration: storedAlarm.duration
-        })
-        $('#startNow').prop("disabled", false);
-        $('#pauseButton').text("Pause");
+    chrome.runtime.getBackgroundPage((backgroundPage) => {
+        backgroundPage.restoreStoredAlarm();
+        comingBackFromAPause();
     });
 };
 
 var maybePauseAlarm = () => {
     chrome.alarms.getAll((alarmArray : any[]) => {
-        if (alarmArray.length > 0) {
+        if (alarmArray.length === 0) {
+            unpauseAlarm();
+            return;
+        }
+
+        var alarm = alarmArray[0];
+        if (alarm.name === "work" || alarm.name === "break") {
             pauseAlarm();
         }
         else {
@@ -156,8 +170,28 @@ window.onload = () => {
     };
 
     document.getElementById('openSettings').onclick = showSettingsPage;
-
     document.getElementById('pauseButton').onclick = maybePauseAlarm;
+
+    document.getElementById('pause1').onclick = () => pauseAlarm(1);
+    document.getElementById('pause2').onclick = () => pauseAlarm(2);
+    document.getElementById('pause4').onclick = () => pauseAlarm(4);
+    document.getElementById('pause8').onclick = () => pauseAlarm(8);
+    document.getElementById('pause24').onclick = () => pauseAlarm(24);
+
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.message === "comingBackFromAPause") {
+            comingBackFromAPause();
+        }
+    });
+
+    chrome.alarms.get('restoreAlarm', (alarm) => {
+        if (alarm === undefined) {
+           return;
+        }
+        console.log(alarm);
+        startAPause();
+    });
 
     initializeSliders();
 };

@@ -27,8 +27,11 @@ class Pomotimer {
                 if (alarm.name === "work") {
                     $('#startNow').text("Begin Break Early");
                 }
-                else {
+                else if (alarm.name === "break") {
                     $('#startNow').text("Begin Work Early");
+                }
+                else {
+                    return;
                 }
 
                 console.log("checking time");

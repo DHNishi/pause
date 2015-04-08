@@ -17,7 +17,19 @@ html
         h1#time 10:00
         div#buttons
             button.btn.btn-primary.btn-flat#startNow Begin Work Early
-            button.btn.btn-primary.btn-flat#pauseButton Pause
+            div.dropdown-options
+                button.btn.btn-primary.btn-flat#pauseButton Pause
+                ul.dropdown-options-menu#pauseDropdown
+                    li
+                        a.btn.btn-primary.btn-xs#pause1 Pause for 1 hour
+                    li
+                        a.btn.btn-primary.btn-xs#pause2 Pause for 2 hours
+                    li
+                        a.btn.btn-primary.btn-xs#pause4 Pause for 4 hours
+                    li
+                        a.btn.btn-primary.btn-xs#pause8 Pause for 8 hours
+                    li
+                        a.btn.btn-primary.btn-xs#pause24 Pause for 24 hours
             button.btn.btn-primary.mdi-action-settings.btn-flat#openSettings
         div#settings
             div

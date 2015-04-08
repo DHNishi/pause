@@ -4,6 +4,8 @@
 
 declare var chrome: any;
 
+// Remove ephemeral alarms.
+chrome.storage.local.remove('restoreAlarm');
 chrome.storage.local.remove('storedAlarm');
 
 var lastDuration = null;
@@ -133,7 +135,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
         });
         scheduleAlarm('break');
     }
-    else {
+    else if (alarm.name === "break") {
         scheduleAlarm('work');
         var workMessage = {
             type: 'basic',
@@ -148,7 +150,28 @@ chrome.alarms.onAlarm.addListener(alarm => {
         });
         scheduleAlarm('work');
     }
+    else if (alarm.name === "restoreAlarm") {
+        restoreStoredAlarm();
+    }
 });
+
+var restoreStoredAlarm = () => {
+    chrome.storage.local.get('storedAlarm', (data) => {
+        var storedAlarm = data['storedAlarm'];
+        if (storedAlarm === undefined) {
+            return;
+        }
+        chrome.runtime.sendMessage({
+            message: 'scheduleAlarm',
+            type: storedAlarm.name,
+            duration: storedAlarm.duration
+        });
+        chrome.storage.local.remove('storedAlarm');
+        chrome.runtime.sendMessage({
+            message: 'comingBackFromAPause'
+        });
+    });
+};
 
 chrome.notifications.onButtonClicked.addListener((notificationId : string, buttonIndex : number) =>
 {

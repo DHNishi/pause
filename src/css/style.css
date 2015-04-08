@@ -34,3 +34,31 @@
 .toggle {
   float: right;
 }
+.paused {
+  color: #a8a8a8;
+}
+.dropdown-options {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-options .dropdown-options-menu {
+  position: absolute;
+  bottom: 100%;
+  display: none;
+  margin: 0;
+  /****************
+   ** NEW STYLES **
+   ****************/
+  list-style: none;
+  /** Remove list bullets */
+  width: 100%;
+  /** Set the width to 100% of it's parent */
+  padding: 0;
+}
+.dropdown-options:hover .dropdown-options-menu {
+  display: block;
+}
+.dropdown-options a {
+  display: block;
+  margin: 0;
+}
