@@ -56,7 +56,7 @@ var remindRunningAlarmsNotification = () => {
         title: 'pause is still running in the background.',
         message: 'Your work/break reminders will continue to fire.',
         buttons: [{title: "Don't remind me again"}, {title: "Don't run alarms after closing pause."}],
-        iconUrl: 'timer-512.png'
+        iconUrl: 'pause-512.png'
     };
 
     chrome.notifications.clear("onClose", (wasCleared) => {
@@ -120,7 +120,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
             title: 'Time for a break!',
             message: 'Your work time has ended.',
             buttons: [{ title: "Skip break" }, { title: "Postpone 10 minutes"}],
-            iconUrl: 'timer-512.png'
+            iconUrl: 'pause-512.png'
         };
         chrome.notifications.clear("breakTime", (wasCleared) => {
             chrome.notifications.create("breakTime", options, (notificationId) => {
@@ -135,7 +135,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
             type: 'basic',
             title: 'Time for work!',
             message: 'Your break time has ended.',
-            iconUrl: 'timer-512.png'
+            iconUrl: 'pause-512.png'
         };
         chrome.notifications.clear("workTime", (wasCleared) => {
             chrome.notifications.create("workTime", workMessage, (notificationId) => {

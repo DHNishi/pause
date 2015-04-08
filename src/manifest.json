@@ -9,9 +9,13 @@
       "persistent": false
     }
   },
+  "icons": {
+    "128": "pause-128.png"
+  },
   "permissions":
-    ["alarms",
-     "notifications",
+    [
+      "alarms",
+      "notifications",
       "storage"
     ]
 }
