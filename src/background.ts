@@ -2,26 +2,62 @@
  * Created by dhnishi on 4/1/15.
  */
 
+var DEFAULT_WORK_MINUTES = 30;
+var DEFAULT_BREAK_MINUTES = 5;
+
+var WINDOW_WIDTH = 500;
+var WINDOW_HEIGHT = 250;
+var DISRUPTOR_WIDTH = 750;
+var DISRUPTOR_HEIGHT = 250;
+
+var SECONDS = 1000;
+var MINUTES = SECONDS * 60;
+var HOURS = MINUTES * 60;
+
 declare var chrome: any;
 
 // Remove ephemeral alarms.
 chrome.alarms.clear('restoreAlarm');
 chrome.storage.local.remove('storedAlarm');
 
+initializeStorageDefaults();
+
 var lastDuration = null;
+
+function initializeStorageDefaults() {
+    chrome.storage.sync.get([
+        'remindOnClose',
+        'clearAlarmsOnClose',
+        'times'
+    ], (data) => {
+        if (data['remindOnClose'] === undefined) {
+            chrome.storage.sync.set({remindOnClose: true});
+        }
+        if (data['clearAlarmsOnCloses'] === undefined) {
+            chrome.storage.sync.set({clearAlarmsOnClose: false});
+        }
+        if (data['times'] === undefined) {
+            var times = {
+                work: DEFAULT_WORK_MINUTES,
+                break: DEFAULT_BREAK_MINUTES
+            };
+            chrome.storage.sync.set({times: times});
+        }
+    });
+}
 
 var createWindow = () => {
     chrome.app.window.create('window.html', {
         'bounds': {
-            'width': 500,
-            'height': 250
+            'width': WINDOW_WIDTH,
+            'height': WINDOW_HEIGHT
         },
         "resizable": false
     }, (appWindow) => {
         appWindow.onClosed.addListener(() => {
             chrome.storage.sync.get('remindOnClose', (data) => {
                 var remindOnClose = data['remindOnClose'];
-                if (remindOnClose === undefined || remindOnClose) {
+                if (remindOnClose) {
                     remindRunningAlarmsNotification();
                 }
             });
@@ -41,8 +77,8 @@ var createDisruptor = () => {
         chrome.app.window.create('disruptor.html', {
             id: "disruptor",
             'bounds': {
-                'width': 750,
-                'height': 250
+                'width': DISRUPTOR_WIDTH,
+                'height': DISRUPTOR_HEIGHT
             },
             "resizable": false
         }, (appWindow) => {
@@ -101,18 +137,15 @@ var scheduleAlarm = (alarmType, timeOverride?) => {
 
     if (timeOverride === undefined) {
         chrome.storage.sync.get('times', (data) => {
-                var alarmTime = (alarmType === "work") ? 25 : 5;
                 var myData = data['times'];
-                if (myData !== undefined && myData[alarmType] !== undefined) {
-                    alarmTime = myData[alarmType];
-                }
-                chrome.alarms.create(alarmType, { when: Date.now() + 1000 * 60 * alarmTime});
+                var alarmTime = myData[alarmType];
+                chrome.alarms.create(alarmType, { when: Date.now() + alarmTime * MINUTES});
                 lastDuration = alarmTime * 60;
             }
         );
     }
     else {
-        chrome.alarms.create(alarmType, { when: Date.now() + 1000 * timeOverride});
+        chrome.alarms.create(alarmType, { when: Date.now() + timeOverride * SECONDS});
         lastDuration = timeOverride;
     }
 };
@@ -120,7 +153,6 @@ var scheduleAlarm = (alarmType, timeOverride?) => {
 chrome.alarms.onAlarm.addListener(alarm => {
     console.log("We received an alarm!", alarm);
     if (alarm.name === "work") {
-        console.log("RING RING: Work time is over!");
         var options = {
             type: 'basic',
             title: 'Time for a break!',

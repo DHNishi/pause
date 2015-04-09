@@ -2,7 +2,7 @@
  * Created by dhnishi on 4/7/15.
  */
 
-/// <reference path="pomodimer.ts" />
+/// <reference path="PauseTimer.ts" />
 
 window.onload = () => {
     $.material.init();
@@ -14,34 +14,18 @@ window.onload = () => {
     };
 
     document.getElementById('take-five').onclick = () => {
-        // TODO: Move logic into Pomodimer.ts.
-        chrome.runtime.sendMessage({
-            message: "scheduleAlarm",
-            type: "work",
-            duration: 5 * 60
-        });
+        myTimer.forceWorkStart(5);
     };
 
     document.getElementById('take-ten').onclick = () => {
-        // TODO: Move logic into Pomodimer.ts.
-        chrome.runtime.sendMessage({
-            message: "scheduleAlarm",
-            type: "work",
-            duration: 10 * 60
-        });
+        myTimer.forceWorkStart(10);
     };
 
-    var updateTimes = () =>
-    {
-        chrome.alarms.getAll( (alarms) => {
-            // TODO: This set of checks occurs enough that it should be in Pomodimer.ts.
-            // Maybe call it "getWorkingAlarm" and call it from several locations?"
-            if (alarms.length === 0) {
-                return;
-            }
-            var alarm = alarms[0];
-            if (alarm.name !== "work" && alarm.name !== "break") {
-                return;
+    function updateTimes() {
+        myTimer.getCurrentAlarm( (alarm) => {
+            console.log(alarm);
+            if (alarm === undefined) {
+               return;
             }
 
             var now = moment();
@@ -49,9 +33,9 @@ window.onload = () => {
             var timeRemaining = moment.duration((alarmTime.diff(now)));
 
             chrome.runtime.getBackgroundPage((backgroundPage) => {
-                console.log(backgroundPage.lastDuration);
                 var alarmDuration = moment.duration(backgroundPage.lastDuration, "seconds");
                 document.getElementById('end-time').innerText = moment.utc(alarmDuration.asMilliseconds()).format('mm:ss');
+
                 var percentDone = 100 - timeRemaining.asSeconds() / alarmDuration.asSeconds() * 100;
                 document.getElementById('time-progress-bar').style.width = "" + percentDone + "%";
             });

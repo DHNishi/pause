@@ -12,9 +12,9 @@ The planned features of this app are as follows:
 6. Create a disruption window feature. If the break strikes, put up a disruption window that is alwaysOnTop. The disruption window has options to skip the break, take 5, or take 10. (Done.)
 7. Pause the timer for definite amounts of time. (Done.)
 9. Clean up and refactor the code for release.
-  * Move all timer business logic code into the timer class.
-  * Rename the timer class from the legacy name Pomodimer to just PauseTimer.
-  * Change var FUNC = () => {} structures into function structures.
+  * Move all timer business logic code into the timer class. (Pretty much done.)
+  * Rename the timer class from the legacy name Pomodimer to just PauseTimer. (Done.)
+  * Change var FUNC = () => {} structures into function structures. (Done.)
   * Re-organize .ts files and annotate the function calls with docstrings.
   * Pass TSLint on all files.
   * Clean up the less files to be more idiomatic.

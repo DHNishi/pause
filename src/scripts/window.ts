@@ -2,12 +2,19 @@
  * Created by dhnishi on 4/7/15.
  */
 
-/// <reference path="pomodimer.ts" />
+/// <reference path="PauseTimer.ts" />
 
 var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 250;
 var WINDOW_HEIGHT_SETTINGS_VISIBLE = 400;
 
-var showSettingsPage = () => {
+var MIN_WORK_SLIDER = 1;
+var MAX_WORK_SLIDER = 120;
+var MIN_BREAK_SLIDER = 1;
+var MAX_BREAK_SLIDER = 60;
+
+var myTimer = new Pomotimer();
+
+function showSettingsPage() {
     chrome.storage.sync.get(['remindOnClose', 'clearAlarmsOnClose'], (data) => {
         var remindOnClose = data['remindOnClose'];
         remindOnClose = (remindOnClose === undefined) ? true : remindOnClose;
@@ -32,26 +39,18 @@ var showSettingsPage = () => {
             currentWindowBounds.height = WINDOW_HEIGHT_SETTINGS_VISIBLE;
         }
     });
-};
+}
 
-var initializeSliders = () => {
+function initializeSliders () {
     chrome.storage.sync.get('times', (data) => {
             // TODO: This function could use some monster clean-up.
-            var timeData = data['times'];
-            if (timeData === undefined) {
-                timeData = { 'work': 30, 'break': 10 };
-            }
-
-            var workMinutes = 25;
-            if (timeData !== undefined && timeData['work'] !== undefined) {
-                workMinutes = timeData['work'];
-            }
+            var workMinutes = data['times']['work'];
             var workSlider = $('#workSlider');
             workSlider.noUiSlider({
                 start: workMinutes,
                 range: {
-                    min: 1,
-                    max: 120
+                    min: MIN_WORK_SLIDER,
+                    max: MAX_WORK_SLIDER
                 }
             });
             workSlider.on({
@@ -59,16 +58,13 @@ var initializeSliders = () => {
             });
             $('#workMinutes').text(workMinutes + " minutes");
 
-            var breakMinutes = 5;
-            if (timeData !== undefined && timeData['break'] !== undefined) {
-                breakMinutes = timeData['break'];
-            }
+            var breakMinutes = data['times']['break'];
             var breakSlider = $('#breakSlider');
             breakSlider.noUiSlider({
                 start: breakMinutes,
                 range: {
-                    min: 1,
-                    max: 60
+                    min: MIN_WORK_SLIDER,
+                    max: MAX_WORK_SLIDER
                 }
             });
             breakSlider.on({
@@ -77,70 +73,42 @@ var initializeSliders = () => {
             $('#breakMinutes').text(breakMinutes + " minutes");
         }
     );
-};
+}
 
-var setSliderMinutes = (sliderType) => {
+function setSliderMinutes(sliderType) {
     var minutes : number = $('#' + sliderType + 'Slider').val();
     minutes = Math.floor(minutes);
     $('#' + sliderType + 'Minutes').text(minutes + " minutes");
 
     var times = chrome.storage.sync.get('times', (data) => {
         var myData = data['times'];
-        if (myData === undefined) {
-            data['times'] = {};
-        }
         data['times'][sliderType] = minutes;
         chrome.storage.sync.set({times: data['times']}, () => {
             console.log(sliderType, " minutes changed to " + minutes);
         });
     });
-};
+}
 
-var pauseAlarm = (pauseHoursDuration?) => {
+function pauseAlarm(pauseHoursDuration?) {
     console.log('pause');
-    // TODO: Refactor this pause logic into the pomodimer.ts.
-    chrome.alarms.getAll((alarmArray : any[]) =>
-    {
-        if (alarmArray.length) {
-            var currentAlarm = alarmArray[0];
-
-            // Check to see if a restored alarm exists already.
-            if (currentAlarm.name !== "restoreAlarm") {
-                var currentAlarmName = currentAlarm.name;
-                var nextAlarmTime = moment.duration(moment(currentAlarm.scheduledTime).diff(moment()));
-
-                var storedAlarm = {
-                    name: currentAlarmName,
-                    duration: nextAlarmTime.asSeconds()
-                };
-
-                chrome.alarms.clearAll();
-                chrome.storage.local.set({ storedAlarm: storedAlarm });
-            }
-            // Set up a potential unpause time in the future.
-            if (pauseHoursDuration) {
-                chrome.alarms.create("restoreAlarm",
-                    {
-                         when: Date.now() + 1000 * 60 * 60 * pauseHoursDuration
-                    });
-            }
+    myTimer.pauseAlarm(pauseHoursDuration, (didPauseAlarm : boolean) => {
+        if (didPauseAlarm){
             startAPause();
         }
     });
-};
+}
 
 function startAPause() {
+    console.log("start a pause");
     $('#startNow').prop("disabled", true);
     $('#pauseButton').text("Unpause");
     $('#time').addClass('paused').text('Paused');
     setPauseTime();
-
 }
 
 function setPauseTime()
 {
     var repeating = setInterval(() => {
-        console.log("repeating");
         chrome.alarms.get("restoreAlarm", (alarm) => {
             if (alarm === undefined) {
                 clearInterval(repeating);
@@ -151,7 +119,6 @@ function setPauseTime()
             $('#time').addClass('duration').text("Paused for " + nextAlarmTime.humanize());
         });
     }, 1000);
-    console.log("No");
 }
 
 function comingBackFromAPause() {
@@ -160,35 +127,27 @@ function comingBackFromAPause() {
     $('#time').text("Unpausing...").removeClass('duration').removeClass('paused');
 }
 
-var unpauseAlarm = () => {
+function unpauseAlarm() {
     chrome.runtime.getBackgroundPage((backgroundPage) => {
         backgroundPage.restoreStoredAlarm();
         comingBackFromAPause();
     });
 };
 
-var maybePauseAlarm = () => {
-    // TODO: Refactor this pause code into the timer itself.
-    chrome.alarms.getAll((alarmArray : any[]) => {
-        if (alarmArray.length === 0) {
-            unpauseAlarm();
-            return;
-        }
-
-        var alarm = alarmArray[0];
-        if (alarm.name === "work" || alarm.name === "break") {
+function maybePauseAlarm() {
+    myTimer.getCurrentAlarm((alarm) => {
+        if (alarm !== undefined) {
             pauseAlarm();
         }
         else {
             unpauseAlarm();
-        }
+       }
     });
 };
 
 window.onload = () => {
     $.material.init();
-
-    var myTimer = new Pomotimer(document.getElementById('time'));
+    myTimer.setTimeElement(document.getElementById('time'));
 
     document.getElementById('startNow').onclick = () => {
         myTimer.startNextNow();
@@ -214,7 +173,6 @@ window.onload = () => {
         if (alarm === undefined) {
            return;
         }
-        console.log(alarm);
         startAPause();
     });
 
