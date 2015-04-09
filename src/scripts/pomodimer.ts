@@ -9,7 +9,6 @@ declare var $ : any;
 
 class Pomotimer {
     timeElement : HTMLElement;
-    countdownCycle : number;
     secondsLeft: number;
 
     constructor(_timeElement = null, reversed = false) {

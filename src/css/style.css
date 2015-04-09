@@ -1,6 +1,10 @@
 #time {
   font-size: 60px;
+  margin: 0;
   text-align: center;
+}
+#time.duration {
+  font-size: 40px;
 }
 #buttons {
   margin-bottom: 20px;
@@ -17,6 +21,10 @@
 }
 #settings {
   display: none;
+}
+.timeContainer {
+  height: 113px;
+  margin-top: 40px;
 }
 .checkboxText {
   display: inline-block;

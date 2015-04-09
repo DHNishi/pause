@@ -36,27 +36,28 @@ window.onload = () => {
                 return;
             }
             var alarm = alarms[0];
+
+            if (alarm.name !== "work" && alarm.name !== "break") {
+                return;
+            }
+
             var now = moment();
             var alarmTime = moment(alarm.scheduledTime);
             var timeRemaining = moment.duration((alarmTime.diff(now)));
 
-            if (alarmDuration !== undefined) {
+            chrome.runtime.getBackgroundPage((backgroundPage) => {
+                console.log(backgroundPage.lastDuration);
+                var alarmDuration = moment.duration(backgroundPage.lastDuration, "seconds");
+                document.getElementById('end-time').innerText = moment.utc(alarmDuration.asMilliseconds()).format('mm:ss');
                 var percentDone = 100 - timeRemaining.asSeconds() / alarmDuration.asSeconds() * 100;
                 document.getElementById('time-progress-bar').style.width = "" + percentDone + "%";
-            }
-        }
+            });
+        });
     };
-    var alarmDuration : moment.Duration = undefined ;
-    chrome.runtime.getBackgroundPage((backgroundPage) => {
-        console.log(backgroundPage.lastDuration);
-        alarmDuration = moment.duration(backgroundPage.lastDuration, "seconds");
-        document.getElementById('end-time').innerText = moment.utc(alarmDuration.asMilliseconds()).format('mm:ss');
-        updateTimes();
-    });
 
+    updateTimes();
 
     var oneSecond = 1000;
-
     setInterval(() => {
         updateTimes();
     }, oneSecond);

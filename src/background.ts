@@ -5,7 +5,7 @@
 declare var chrome: any;
 
 // Remove ephemeral alarms.
-chrome.storage.local.remove('restoreAlarm');
+chrome.alarms.clear('restoreAlarm');
 chrome.storage.local.remove('storedAlarm');
 
 var lastDuration = null;

@@ -101,18 +101,20 @@ var pauseAlarm = (pauseHoursDuration?) => {
     {
         if (alarmArray.length) {
             var currentAlarm = alarmArray[0];
-            var currentAlarmName = currentAlarm.name;
-            var nextAlarmTime = moment.duration(moment(currentAlarm.scheduledTime).diff(moment()));
 
-            var storedAlarm = {
-                name: currentAlarmName,
-                duration: nextAlarmTime.asSeconds()
-            };
+            // Check to see if a restored alarm exists already.
+            if (currentAlarm.name !== "restoreAlarm") {
+                var currentAlarmName = currentAlarm.name;
+                var nextAlarmTime = moment.duration(moment(currentAlarm.scheduledTime).diff(moment()));
 
-            chrome.alarms.clearAll();
-            chrome.storage.local.set({ storedAlarm: storedAlarm });
-            startAPause();
+                var storedAlarm = {
+                    name: currentAlarmName,
+                    duration: nextAlarmTime.asSeconds()
+                };
 
+                chrome.alarms.clearAll();
+                chrome.storage.local.set({ storedAlarm: storedAlarm });
+            }
             // Set up a potential unpause time in the future.
             if (pauseHoursDuration) {
                 chrome.alarms.create("restoreAlarm",
@@ -120,6 +122,7 @@ var pauseAlarm = (pauseHoursDuration?) => {
                          when: Date.now() + 1000 * 60 * 60 * pauseHoursDuration
                     });
             }
+            startAPause();
         }
     });
 };
@@ -128,12 +131,31 @@ function startAPause() {
     $('#startNow').prop("disabled", true);
     $('#pauseButton').text("Unpause");
     $('#time').addClass('paused').text('Paused');
+    setPauseTime();
+
+}
+
+function setPauseTime()
+{
+    var repeating = setInterval(() => {
+        console.log("repeating");
+        chrome.alarms.get("restoreAlarm", (alarm) => {
+            if (alarm === undefined) {
+                clearInterval(repeating);
+                return;
+            }
+
+            var nextAlarmTime = moment.duration(moment(alarm.scheduledTime).diff(moment()));
+            $('#time').addClass('duration').text("Paused for " + nextAlarmTime.humanize());
+        });
+    }, 1000);
+    console.log("No");
 }
 
 function comingBackFromAPause() {
     $('#startNow').prop("disabled", false);
     $('#pauseButton').text("Pause");
-    $('#time').removeClass('paused');
+    $('#time').text("Unpausing...").removeClass('duration').removeClass('paused');
 }
 
 var unpauseAlarm = () => {
