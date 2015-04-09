@@ -62,8 +62,8 @@ function initializeSliders () {
             breakSlider.noUiSlider({
                 start: breakMinutes,
                 range: {
-                    min: MIN_WORK_SLIDER,
-                    max: MAX_WORK_SLIDER
+                    min: MIN_BREAK_SLIDER,
+                    max: MAX_BREAK_SLIDER
                 }
             });
             breakSlider.on({
