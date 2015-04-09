@@ -5,7 +5,7 @@
   "manifest_version": 2,
   "app": {
     "background": {
-      "scripts": ["background.js"],
+      "scripts": ["background.js", "components/moment/moment.js", "scripts/TimerHelpers.js"],
       "persistent": false
     }
   },
@@ -15,6 +15,7 @@
   "permissions":
     [
       "alarms",
+      "idle",
       "notifications",
       "storage"
     ]

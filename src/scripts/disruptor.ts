@@ -2,6 +2,7 @@
  * Created by dhnishi on 4/7/15.
  */
 
+/// <reference path="TimerHelpers.ts" />
 /// <reference path="PauseTimer.ts" />
 
 window.onload = () => {
@@ -10,19 +11,19 @@ window.onload = () => {
     var myTimer = new Pomotimer(document.getElementById('small-time'), true);
 
     document.getElementById('skip-break').onclick = () => {
-        myTimer.startNextNow();
+        startNextNow();
     };
 
     document.getElementById('take-five').onclick = () => {
-        myTimer.forceWorkStart(5);
+        forceWorkStart(5);
     };
 
     document.getElementById('take-ten').onclick = () => {
-        myTimer.forceWorkStart(10);
+        forceWorkStart(10);
     };
 
     function updateTimes() {
-        myTimer.getCurrentAlarm( (alarm) => {
+        getCurrentAlarm( (alarm) => {
             console.log(alarm);
             if (alarm === undefined) {
                return;

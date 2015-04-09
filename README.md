@@ -15,15 +15,17 @@ The planned features of this app are as follows:
   * Move all timer business logic code into the timer class. (Pretty much done.)
   * Rename the timer class from the legacy name Pomodimer to just PauseTimer. (Done.)
   * Change var FUNC = () => {} structures into function structures. (Done.)
-  * Re-organize .ts files and annotate the function calls with docstrings.
+  * Re-organize .ts files and annotate the function calls with docstrings. (In-progress).
   * Pass TSLint on all files.
   * Clean up the less files to be more idiomatic.
 10. Release to the Chrome app store.
 
 The stretch features of this app are as follows:
 
-0. Use the chrome.idle.* API to add an option to selectively pause/reset the timer when the system has been idle for greater than X minutes.
+0. Use the chrome.idle.* API to add an option to selectively pause/reset the timer when the system has been idle for greater than X minutes. (Done.)
 1. I receive a notification on my phone/other devices when my break is up.
 2. My break durations and work durations are logged to the app.
 
-We can trigger a sound from the background page using: http://stackoverflow.com/questions/17509520/chrome-extension-play-sound-in-background-script
+Known issues:
+
+Alarms act funny if returning from logging out and "trigger" while logged out.

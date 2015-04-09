@@ -2,8 +2,12 @@
  * Created by dhnishi on 4/1/15.
  */
 
+/// <reference path="scripts/TimerHelpers.ts" />
+/// <reference path="scripts/PauseTimer.ts" />
+
 var DEFAULT_WORK_MINUTES = 30;
 var DEFAULT_BREAK_MINUTES = 5;
+var DEFAULT_IDLE_DURATION = 60 * 5;
 
 var WINDOW_WIDTH = 500;
 var WINDOW_HEIGHT = 250;
@@ -19,6 +23,7 @@ declare var chrome: any;
 // Remove ephemeral alarms.
 chrome.alarms.clear('restoreAlarm');
 chrome.storage.local.remove('storedAlarm');
+chrome.storage.local.remove("pauseFromIdle");
 
 initializeStorageDefaults();
 
@@ -187,24 +192,6 @@ chrome.alarms.onAlarm.addListener(alarm => {
     }
 });
 
-var restoreStoredAlarm = () => {
-    chrome.storage.local.get('storedAlarm', (data) => {
-        var storedAlarm = data['storedAlarm'];
-        if (storedAlarm === undefined) {
-            return;
-        }
-        chrome.runtime.sendMessage({
-            message: 'scheduleAlarm',
-            type: storedAlarm.name,
-            duration: storedAlarm.duration
-        });
-        chrome.storage.local.remove('storedAlarm');
-        chrome.runtime.sendMessage({
-            message: 'comingBackFromAPause'
-        });
-    });
-};
-
 chrome.notifications.onButtonClicked.addListener((notificationId : string, buttonIndex : number) =>
 {
     if (notificationId === "breakTime") {
@@ -240,4 +227,29 @@ chrome.notifications.onClicked.addListener(notificationId => {
     else {
         createWindow();
     }
+});
+
+chrome.idle.setDetectionInterval(DEFAULT_IDLE_DURATION);
+chrome.idle.onStateChanged.addListener((state) => {
+    console.log("Idle changed: ", state);
+    if (state === "idle") {
+        chrome.alarms.get('work', alarm => {
+            if (alarm === undefined) {
+                return;
+            }
+
+            pauseAlarm();
+            // TODO: Set an alarm to invalidate the stored alarm after a full break of time.
+            chrome.storage.local.set({ pauseFromIdle: true});
+        });
+    }
+    if (state === "active") {
+        chrome.storage.local.get(['pauseFromIdle'], data => {
+            if (data.pauseFromIdle) {
+                chrome.storage.local.set({ pauseFromIdle: false});
+                restoreStoredAlarm();
+            }
+        });
+    }
+    // TODO: Check if alarm is expired. Due to a chrome.alarms bug, we need to work around this.
 });

@@ -3,6 +3,7 @@
  */
 
 /// <reference path="PauseTimer.ts" />
+/// <reference path="TimerHelpers.ts" />
 
 var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 250;
 var WINDOW_HEIGHT_SETTINGS_VISIBLE = 400;
@@ -11,8 +12,6 @@ var MIN_WORK_SLIDER = 1;
 var MAX_WORK_SLIDER = 120;
 var MIN_BREAK_SLIDER = 1;
 var MAX_BREAK_SLIDER = 60;
-
-var myTimer = new Pomotimer();
 
 function showSettingsPage() {
     chrome.storage.sync.get(['remindOnClose', 'clearAlarmsOnClose'], (data) => {
@@ -89,15 +88,6 @@ function setSliderMinutes(sliderType) {
     });
 }
 
-function pauseAlarm(pauseHoursDuration?) {
-    console.log('pause');
-    myTimer.pauseAlarm(pauseHoursDuration, (didPauseAlarm : boolean) => {
-        if (didPauseAlarm){
-            startAPause();
-        }
-    });
-}
-
 function startAPause() {
     console.log("start a pause");
     $('#startNow').prop("disabled", true);
@@ -127,35 +117,32 @@ function comingBackFromAPause() {
     $('#time').text("Unpausing...").removeClass('duration').removeClass('paused');
 }
 
-function unpauseAlarm() {
-    chrome.runtime.getBackgroundPage((backgroundPage) => {
-        backgroundPage.restoreStoredAlarm();
-        comingBackFromAPause();
-    });
-};
-
 function maybePauseAlarm() {
-    myTimer.getCurrentAlarm((alarm) => {
+    getCurrentAlarm((alarm) => {
         if (alarm !== undefined) {
-            pauseAlarm();
+            pauseAlarm(undefined, (didPauseAlarm : boolean) => {
+                if (didPauseAlarm){
+                    startAPause();
+                }
+            });
         }
         else {
-            unpauseAlarm();
+            restoreStoredAlarm();
        }
     });
 };
 
 window.onload = () => {
     $.material.init();
+    var myTimer = new Pomotimer();
     myTimer.setTimeElement(document.getElementById('time'));
 
     document.getElementById('startNow').onclick = () => {
-        myTimer.startNextNow();
+        startNextNow();
     };
 
     document.getElementById('openSettings').onclick = showSettingsPage;
     document.getElementById('pauseButton').onclick = maybePauseAlarm;
-
     document.getElementById('pause1').onclick = () => pauseAlarm(1);
     document.getElementById('pause2').onclick = () => pauseAlarm(2);
     document.getElementById('pause4').onclick = () => pauseAlarm(4);
@@ -166,6 +153,9 @@ window.onload = () => {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.message === "comingBackFromAPause") {
             comingBackFromAPause();
+        }
+        else if (request === "startingAPause") {
+            startAPause();
         }
     });
 
