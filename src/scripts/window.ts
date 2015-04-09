@@ -159,9 +159,9 @@ window.onload = () => {
         }
     });
 
-    chrome.alarms.get('restoreAlarm', (alarm) => {
-        if (alarm === undefined) {
-           return;
+    chrome.storage.local.get('storedAlarm', data => {
+        if (data.storedAlarm === undefined) {
+            return;
         }
         startAPause();
     });

@@ -20,13 +20,9 @@ var HOURS = MINUTES * 60;
 
 declare var chrome: any;
 
-// Remove ephemeral alarms.
-chrome.alarms.clear('restoreAlarm');
-chrome.storage.local.remove('storedAlarm');
-chrome.storage.local.remove("pauseFromIdle");
-
 initializeStorageDefaults();
 
+// TODO: Remove lastDuration -- or refactor it into TimerHelpers.
 var lastDuration = null;
 
 function initializeStorageDefaults() {
@@ -112,6 +108,16 @@ var remindRunningAlarmsNotification = () => {
 };
 
 chrome.app.runtime.onLaunched.addListener(function() {
+    chrome.storage.local.remove("pauseFromIdle");
+    chrome.storage.local.get("storedAlarm", alarm => {
+        if (alarm.storedAlarm === undefined) {
+            chrome.alarms.getAll(alarms => {
+               if (alarm.length === 0) {
+                   scheduleAlarm("work");
+               }
+            });
+        }
+    });
     createWindow();
 });
 
@@ -127,9 +133,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
+// TODO: Move this function into TimerHelpers.
 var scheduleAlarm = (alarmType, timeOverride?) => {
     chrome.alarms.clearAll();
 
+    // TODO: Refactor this into a callback when the message is received.
     if (alarmType === "break") {
         createDisruptor();
     }
@@ -202,7 +210,7 @@ chrome.notifications.onButtonClicked.addListener((notificationId : string, butto
             scheduleAlarm('work');
         }
         else {
-            scheduleAlarm('work', 10);
+            scheduleAlarm('work', 10 * 60);
         }
     }
     else if (notificationId === "onClose") {
