@@ -38,6 +38,7 @@ function getCurrentAlarm(callback) {
 
         if (alarm === undefined || (alarm.name !== "work" && alarm.name !== "break")) {
             callback(undefined);
+            return;
         }
         callback(alarm);
     });

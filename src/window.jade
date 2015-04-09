@@ -3,11 +3,10 @@ html
     head(lang='en')
         meta(charset="UTF-8")
         title pause - Work/Break Timer
-        link(rel='stylesheet', href='components/bootstrap-material-design/dist/css/material.css')
+        link(rel='stylesheet', href='/components/materialize/dist/css/materialize.css')
         link(rel='stylesheet', href='css/style.css')
         script(src='components/jquery/dist/jquery.js')
-        script(src='components/bootstrap-material-design/dist/js/material.js')
-        script(src='components/bootstrap-material-design/dist/js/ripples.js')
+        script(src='components/materialize/dist/js/materialize.js')
         script(src='components/moment/moment.js')
         script(src='scripts/jquery.nouislider.min.js')
         script(src='scripts/TimerHelpers.js')
@@ -17,34 +16,39 @@ html
         div.timeContainer
             h1#time No Alarm Set
         div#buttons
-            button.btn.btn-primary.btn-flat#startNow Begin Work Early
+            button.btn#startNow Begin Work Early
             div.dropdown-options
-                button.btn.btn-primary.btn-flat#pauseButton Pause
+                button.btn#pauseButton Pause
                 ul.dropdown-options-menu#pauseDropdown
                     li
-                        a.btn.btn-primary.btn-xs#pause1 Pause for 1 hour
+                        a.btn#pause1 Pause for 1 hour
                     li
-                        a.btn.btn-primary.btn-xs#pause2 Pause for 2 hours
+                        a.btn#pause2 Pause for 2 hours
                     li
-                        a.btn.btn-primary.btn-xs#pause4 Pause for 4 hours
+                        a.btn#pause4 Pause for 4 hours
                     li
-                        a.btn.btn-primary.btn-xs#pause8 Pause for 8 hours
+                        a.btn#pause8 Pause for 8 hours
                     li
-                        a.btn.btn-primary.btn-xs#pause24 Pause for 24 hours
-            button.btn.btn-primary.mdi-action-settings.btn-flat#openSettings
+                        a.btn#pause24 Pause for 24 hours
+            button.btn#openSettings
+                i.mdi-action-settings
         div#settings
             div
-                span.sliderHeader Focus Time:
-                span#workMinutes 25 minutes
-            div#workSlider.slider.shor
-            div
-                span.sliderHeader Break Time:
-                span#breakMinutes 5 minutes
-            div#breakSlider.slider.shor
-            div.togglebutton
-                    label Remind me about alarms when closing.
-                        input#remindAlarmsCheckbox(type="checkbox")
-            div.togglebutton
+                form
+                    span.sliderHeader Focus Time:
+                    span#workMinutes 25 minutes
+                    p.range-field
+                        input#work-slider.settings-range(type="range")
+                    span.sliderHeader Break Time:
+                    span#breakMinutes 5 minutes
+                    p.range-field
+                        input#break-slider.settings-range(type="range")
+            div.switch.switch-space
+                label Remind me about alarms when closing.
+                    input#remindAlarmsCheckbox(type="checkbox")
+                    span.lever.lever-right
+            div.switch.switch-space
                 label Clear alarms when closing.
                     input#clearAlarmsCheckbox(type="checkbox")
+                    span.lever.lever-right
 

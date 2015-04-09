@@ -11,6 +11,7 @@ The planned features of this app are as follows:
 5. Change out the assets to be my own assets. (Done.)
 6. Create a disruption window feature. If the break strikes, put up a disruption window that is alwaysOnTop. The disruption window has options to skip the break, take 5, or take 10. (Done.)
 7. Pause the timer for definite amounts of time. (Done.)
+8. Convert over to using the Materialize CSS library to avoid bizarre licensing issues.
 9. Clean up and refactor the code for release.
   * Move all timer business logic code into the timer class. (Pretty much done.)
   * Rename the timer class from the legacy name Pomodimer to just PauseTimer. (Done.)

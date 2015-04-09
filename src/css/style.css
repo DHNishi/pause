@@ -15,12 +15,17 @@
 }
 #buttons button {
   font-size: 16px;
+  margin: 0 5px;
 }
 .sliderHeader {
   margin-right: 12px;
 }
 #settings {
   display: none;
+  margin: 0px 15px;
+}
+#settings .settings-range {
+  margin-bottom: 5px;
 }
 .timeContainer {
   height: 113px;
@@ -69,4 +74,13 @@
 .dropdown-options a {
   display: block;
   margin: 0;
+  height: 23px;
+  line-height: 23px;
+  padding: 0;
+}
+.lever-right {
+  float: right;
+}
+.switch {
+  margin: 10px 0px;
 }

@@ -34,7 +34,7 @@ body,
 }
 #time-progress {
   width: 475px;
-  margin: auto;
+  margin: 15px auto;
 }
 #time-progress #time-progress-bar {
   width: 0%;

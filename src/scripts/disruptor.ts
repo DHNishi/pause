@@ -6,8 +6,6 @@
 /// <reference path="PauseTimer.ts" />
 
 window.onload = () => {
-    $.material.init();
-
     var myTimer = new Pomotimer(document.getElementById('small-time'), true);
 
     document.getElementById('skip-break').onclick = () => {

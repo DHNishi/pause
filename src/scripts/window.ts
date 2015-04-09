@@ -44,41 +44,31 @@ function initializeSliders () {
     chrome.storage.sync.get('times', (data) => {
             // TODO: This function could use some monster clean-up.
             var workMinutes = data['times']['work'];
-            var workSlider = $('#workSlider');
-            workSlider.noUiSlider({
-                start: workMinutes,
-                range: {
-                    min: MIN_WORK_SLIDER,
-                    max: MAX_WORK_SLIDER
-                }
+            var workSlider = $('#work-slider');
+            workSlider.attr('min', MIN_WORK_SLIDER);
+            workSlider.attr('max', MAX_WORK_SLIDER);
+            workSlider.on("change", () => {
+                setSliderMinutes("work", workSlider.val());
             });
-            workSlider.on({
-                change: () => setSliderMinutes("work")
-            });
+            workSlider.val(workMinutes);
             $('#workMinutes').text(workMinutes + " minutes");
 
             var breakMinutes = data['times']['break'];
-            var breakSlider = $('#breakSlider');
-            breakSlider.noUiSlider({
-                start: breakMinutes,
-                range: {
-                    min: MIN_BREAK_SLIDER,
-                    max: MAX_BREAK_SLIDER
-                }
+            var breakSlider = $('#break-slider');
+            breakSlider.attr('min', MIN_BREAK_SLIDER);
+            breakSlider.attr('max', MAX_BREAK_SLIDER);
+            breakSlider.on("change", () => {
+                setSliderMinutes("break", breakSlider.val());
             });
-            breakSlider.on({
-                change: () => setSliderMinutes("break")
-            });
+            breakSlider.val(breakMinutes);
             $('#breakMinutes').text(breakMinutes + " minutes");
         }
     );
 }
 
-function setSliderMinutes(sliderType) {
-    var minutes : number = $('#' + sliderType + 'Slider').val();
-    minutes = Math.floor(minutes);
+function setSliderMinutes(sliderType, value) {
+    var minutes = Math.floor(value);
     $('#' + sliderType + 'Minutes').text(minutes + " minutes");
-
     var times = chrome.storage.sync.get('times', (data) => {
         var myData = data['times'];
         data['times'][sliderType] = minutes;
@@ -121,9 +111,6 @@ function maybePauseAlarm() {
     getCurrentAlarm((alarm) => {
         if (alarm !== undefined) {
             pauseAlarm(undefined, (didPauseAlarm : boolean) => {
-                if (didPauseAlarm){
-                    startAPause();
-                }
             });
         }
         else {
@@ -133,7 +120,6 @@ function maybePauseAlarm() {
 };
 
 window.onload = () => {
-    $.material.init();
     var myTimer = new Pomotimer();
     myTimer.setTimeElement(document.getElementById('time'));
 

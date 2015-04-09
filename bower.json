@@ -1,6 +1,6 @@
 {
-  "name": "Pomodimer",
-  "version": "0.0.0",
+  "name": "Pause",
+  "version": "0.1.0",
   "authors": [
     "dhnishi <dhnishi@gmail.com>"
   ],
@@ -15,6 +15,6 @@
   ],
   "dependencies": {
     "moment": "~2.9.0",
-    "bootstrap-material-design": "~0.3.0"
+    "materialize": "~0.96.1"
   }
 }

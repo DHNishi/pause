@@ -49,14 +49,14 @@ class Pomotimer {
                     var alarmDuration = moment.duration(backgroundPage.lastDuration, "seconds");
                     alarmDuration = alarmDuration.subtract(timeRemaining);
                     if (this.timeElement) {
-                        this.timeElement.innerText = moment.utc(alarmDuration.asMilliseconds()).format('mm:ss');
+                        this.timeElement.innerText = this.humanizeDuration(alarmDuration);
                     }
                 });
             }
             else {
                 this.secondsLeft = timeRemaining.asSeconds();
                 if (this.timeElement) {
-                    this.timeElement.innerText = moment.utc(timeRemaining.asMilliseconds()).format('mm:ss');
+                    this.timeElement.innerText = this.humanizeDuration(timeRemaining);
                 }
             }
         });
@@ -64,5 +64,17 @@ class Pomotimer {
 
     setTimeElement(timeElement : HTMLElement) {
         this.timeElement = timeElement;
+    }
+
+    humanizeDuration(duration : moment.Duration) {
+        var minutes : any = Math.floor(duration.asMinutes());
+        var seconds : any = duration.seconds();
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+            seconds = "0" + seconds;
+        }
+        return minutes + ":" + seconds;
     }
 }
