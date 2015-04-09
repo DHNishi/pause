@@ -14,6 +14,7 @@ window.onload = () => {
     };
 
     document.getElementById('take-five').onclick = () => {
+        // TODO: Move logic into Pomodimer.ts.
         chrome.runtime.sendMessage({
             message: "scheduleAlarm",
             type: "work",
@@ -22,6 +23,7 @@ window.onload = () => {
     };
 
     document.getElementById('take-ten').onclick = () => {
+        // TODO: Move logic into Pomodimer.ts.
         chrome.runtime.sendMessage({
             message: "scheduleAlarm",
             type: "work",
@@ -32,11 +34,12 @@ window.onload = () => {
     var updateTimes = () =>
     {
         chrome.alarms.getAll( (alarms) => {
+            // TODO: This set of checks occurs enough that it should be in Pomodimer.ts.
+            // Maybe call it "getWorkingAlarm" and call it from several locations?"
             if (alarms.length === 0) {
                 return;
             }
             var alarm = alarms[0];
-
             if (alarm.name !== "work" && alarm.name !== "break") {
                 return;
             }

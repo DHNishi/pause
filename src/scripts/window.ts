@@ -36,6 +36,7 @@ var showSettingsPage = () => {
 
 var initializeSliders = () => {
     chrome.storage.sync.get('times', (data) => {
+            // TODO: This function could use some monster clean-up.
             var timeData = data['times'];
             if (timeData === undefined) {
                 timeData = { 'work': 30, 'break': 10 };
@@ -97,6 +98,7 @@ var setSliderMinutes = (sliderType) => {
 
 var pauseAlarm = (pauseHoursDuration?) => {
     console.log('pause');
+    // TODO: Refactor this pause logic into the pomodimer.ts.
     chrome.alarms.getAll((alarmArray : any[]) =>
     {
         if (alarmArray.length) {
@@ -166,6 +168,7 @@ var unpauseAlarm = () => {
 };
 
 var maybePauseAlarm = () => {
+    // TODO: Refactor this pause code into the timer itself.
     chrome.alarms.getAll((alarmArray : any[]) => {
         if (alarmArray.length === 0) {
             unpauseAlarm();

@@ -45,9 +45,9 @@ var createDisruptor = () => {
                 'height': 250
             },
             "resizable": false
-        }), (appWindow) => {
+        }, (appWindow) => {
             appWindow.maximize();
-        };
+        });
     }
     else {
         disruptorWindow.show();
