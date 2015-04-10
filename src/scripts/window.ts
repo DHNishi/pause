@@ -5,8 +5,8 @@
 /// <reference path="PauseTimer.ts" />
 /// <reference path="TimerHelpers.ts" />
 
-var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 250;
-var WINDOW_HEIGHT_SETTINGS_VISIBLE = 400;
+var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 170;
+var WINDOW_HEIGHT_SETTINGS_VISIBLE = 390;
 
 var MIN_WORK_SLIDER = 1;
 var MAX_WORK_SLIDER = 120;

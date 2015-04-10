@@ -8,7 +8,6 @@ html
         script(src='components/jquery/dist/jquery.js')
         script(src='components/materialize/dist/js/materialize.js')
         script(src='components/moment/moment.js')
-        script(src='scripts/jquery.nouislider.min.js')
         script(src='scripts/TimerHelpers.js')
         script(src='scripts/PauseTimer.js')
         script(src='scripts/window.js')
@@ -16,23 +15,23 @@ html
         div.timeContainer
             h1#time No Alarm Set
         div#buttons
-            button.btn#startNow Begin Work Early
+            button.btn.waves-effect.waves-light#startNow Begin Work Early
             div.dropdown-options
-                button.btn#pauseButton Pause
+                button.btn.waves-effect.waves-light#pauseButton Pause
                 ul.dropdown-options-menu#pauseDropdown
                     li
-                        a.btn#pause1 Pause for 1 hour
+                        a.btn.waves-effect.waves-light#pause1 Pause for 1 hour
                     li
-                        a.btn#pause2 Pause for 2 hours
+                        a.btn.waves-effect.waves-light#pause2 Pause for 2 hours
                     li
-                        a.btn#pause4 Pause for 4 hours
+                        a.btn.waves-effect.waves-light#pause4 Pause for 4 hours
                     li
-                        a.btn#pause8 Pause for 8 hours
+                        a.btn.waves-effect.waves-light#pause8 Pause for 8 hours
                     li
-                        a.btn#pause24 Pause for 24 hours
-            button.btn#openSettings
+                        a.btn.waves-effect.waves-light#pause24 Pause for 24 hours
+            button.btn.waves-effect.waves-light#openSettings
                 i.mdi-action-settings
-        div#settings
+        div.card#settings
             div
                 form
                     span.sliderHeader Focus Time:

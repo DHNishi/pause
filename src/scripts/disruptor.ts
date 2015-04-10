@@ -22,7 +22,6 @@ window.onload = () => {
 
     function updateTimes() {
         getCurrentAlarm( (alarm) => {
-            console.log(alarm);
             if (alarm === undefined) {
                return;
             }
