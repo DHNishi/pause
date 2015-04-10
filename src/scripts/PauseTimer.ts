@@ -22,20 +22,17 @@ class Pomotimer {
     }
 
     updateTimeElement(reversed : boolean) {
-        chrome.alarms.getAll((alarms : any[]) =>
-        {
+        chrome.alarms.getAll((alarms : any[]) => {
             if (alarms.length === 0) {
                 return;
             }
             var alarm = alarms[0];
 
             if (alarm.name === "work") {
-                $('#startNow').text("Begin Break Early");
-            }
-            else if (alarm.name === "break") {
-                $('#startNow').text("Begin Work Early");
-            }
-            else {
+                $("#startNow").text("Begin Break Early");
+            } else if (alarm.name === "break") {
+                $("#startNow").text("Begin Work Early");
+            } else {
                 return;
             }
 
@@ -52,8 +49,7 @@ class Pomotimer {
                         this.timeElement.innerText = this.humanizeDuration(alarmDuration);
                     }
                 });
-            }
-            else {
+            } else {
                 this.secondsLeft = timeRemaining.asSeconds();
                 if (this.timeElement) {
                     this.timeElement.innerText = this.humanizeDuration(timeRemaining);

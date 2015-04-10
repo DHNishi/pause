@@ -6,17 +6,17 @@
 /// <reference path="PauseTimer.ts" />
 
 window.onload = () => {
-    var myTimer = new Pomotimer(document.getElementById('small-time'), true);
+    var myTimer = new Pomotimer(document.getElementById("small-time"), true);
 
-    document.getElementById('skip-break').onclick = () => {
+    document.getElementById("skip-break").onclick = () => {
         startNextNow();
     };
 
-    document.getElementById('take-five').onclick = () => {
+    document.getElementById("take-five").onclick = () => {
         forceWorkStart(5);
     };
 
-    document.getElementById('take-ten').onclick = () => {
+    document.getElementById("take-ten").onclick = () => {
         forceWorkStart(10);
     };
 
@@ -33,10 +33,10 @@ window.onload = () => {
 
             chrome.runtime.getBackgroundPage((backgroundPage) => {
                 var alarmDuration = moment.duration(backgroundPage.lastDuration, "seconds");
-                document.getElementById('end-time').innerText = moment.utc(alarmDuration.asMilliseconds()).format('mm:ss');
+                document.getElementById("end-time").innerText = moment.utc(alarmDuration.asMilliseconds()).format("mm:ss");
 
                 var percentDone = 100 - timeRemaining.asSeconds() / alarmDuration.asSeconds() * 100;
-                document.getElementById('time-progress-bar').style.width = "" + percentDone + "%";
+                document.getElementById("time-progress-bar").style.width = "" + percentDone + "%";
             });
         });
     };
