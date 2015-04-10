@@ -70,7 +70,7 @@ function setSliderMinutes(sliderType, value) {
     $("#" + sliderType + "Minutes").text(minutes + " minutes");
     var times = chrome.storage.sync.get("times", (data) => {
         var myData = data.times;
-        data.times.sliderType = minutes;
+        data.times[sliderType] = minutes;
         chrome.storage.sync.set({times: data.times}, () => {
             console.log(sliderType, " minutes changed to " + minutes);
         });

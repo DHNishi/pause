@@ -29,10 +29,10 @@ class Pomotimer {
             var alarm = alarms[0];
 
             if (alarm.name === "work") {
-                $("#startNow").text("Begin Break Early");
+                $("#startNow").text("Start Break Now");
                 $("#restartNow").text("Restart Work Countdown");
             } else if (alarm.name === "break") {
-                $("#startNow").text("Begin Work Early");
+                $("#startNow").text("Start Work Now");
                 $("#restartNow").text("Restart Break Countdown");
             } else {
                 return;

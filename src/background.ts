@@ -148,6 +148,7 @@ function scheduleAlarm(alarmType, timeOverride?) {
         chrome.storage.sync.get("times", (data) => {
                 var myData = data.times;
                 var alarmTime = myData[alarmType];
+                console.log(alarmTime);
                 chrome.alarms.create(alarmType, { when: Date.now() + alarmTime * MINUTES});
                 lastDuration = alarmTime * 60;
             }
