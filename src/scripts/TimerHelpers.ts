@@ -7,31 +7,29 @@
 declare var chrome: any;
 
 function startNextNow() {
-    chrome.alarms.getAll((alarmArray : any[]) =>
-    {
+    chrome.alarms.getAll((alarmArray : any[]) => {
         if (alarmArray.length) {
             var currentAlarm = alarmArray[0];
             if (currentAlarm.name === "work") {
-                chrome.runtime.sendMessage('scheduleBreak');
+                chrome.runtime.sendMessage("scheduleBreak");
                 return;
             }
         }
         // Start work.
-        chrome.runtime.sendMessage('scheduleWork');
+        chrome.runtime.sendMessage("scheduleWork");
     });
 }
 
 function restartCurrentAlarm() {
-    chrome.alarms.getAll((alarmArray : any[]) =>
-    {
+    chrome.alarms.getAll((alarmArray : any[]) => {
         if (alarmArray.length) {
             var currentAlarm = alarmArray[0];
             if (currentAlarm.name === "work") {
-                chrome.runtime.sendMessage('scheduleWork');
+                chrome.runtime.sendMessage("scheduleWork");
                 return;
             }
         }
-        chrome.runtime.sendMessage('scheduleBreak');
+        chrome.runtime.sendMessage("scheduleBreak");
     });
 }
 
@@ -59,8 +57,7 @@ function getCurrentAlarm(callback) {
 }
 
 function pauseAlarm(pauseHoursDuration? : number, callback?) {
-    chrome.alarms.getAll((alarmArray : any[]) =>
-    {
+    chrome.alarms.getAll((alarmArray : any[]) => {
         if (alarmArray.length) {
             var currentAlarm = alarmArray[0];
 
@@ -97,19 +94,19 @@ function pauseAlarm(pauseHoursDuration? : number, callback?) {
 
 
 function restoreStoredAlarm() {
-    chrome.storage.local.get('storedAlarm', (data) => {
-        var storedAlarm = data['storedAlarm'];
+    chrome.storage.local.get("storedAlarm", (data) => {
+        var storedAlarm = data.storedAlarm;
         if (storedAlarm === undefined) {
             return;
         }
         chrome.runtime.sendMessage({
-            message: 'scheduleAlarm',
+            message: "scheduleAlarm",
             type: storedAlarm.name,
             duration: storedAlarm.duration
         });
-        chrome.storage.local.remove('storedAlarm');
+        chrome.storage.local.remove("storedAlarm");
         chrome.runtime.sendMessage({
-            message: 'comingBackFromAPause'
+            message: "comingBackFromAPause"
         });
     });
 }
