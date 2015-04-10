@@ -20,22 +20,19 @@ var HOURS = MINUTES * 60;
 
 declare var chrome: any;
 
-initializeStorageDefaults();
-
 // TODO: Remove lastDuration -- or refactor it into TimerHelpers.
 var lastDuration = null;
 
-function initializeStorageDefaults() {
+function initializeStorageDefaults(callback) {
     chrome.storage.sync.get([
         "remindOnClose",
         "clearAlarmsOnClose",
-        "times"
+        "times",
     ], (data) => {
         if (data.remindOnClose === undefined) {
             chrome.storage.sync.set({remindOnClose: true});
         }
         if (data.clearAlarmsOnCloses === undefined) {
-            chrome.storage.sync.set({clearAlarmsOnClose: false});
         }
         if (data.times === undefined) {
             var times = {
@@ -44,6 +41,7 @@ function initializeStorageDefaults() {
             };
             chrome.storage.sync.set({times: times});
         }
+        callback();
     });
 }
 
@@ -107,17 +105,19 @@ function remindRunningAlarmsNotification() {
 };
 
 chrome.app.runtime.onLaunched.addListener(function() {
-    chrome.storage.local.remove("pauseFromIdle");
-    chrome.storage.local.get("storedAlarm", alarm => {
-        if (alarm.storedAlarm === undefined) {
-            chrome.alarms.getAll(alarms => {
-               if (alarm.length === 0) {
-                   scheduleAlarm("work");
-               }
-            });
-        }
+    initializeStorageDefaults(() => {
+        chrome.storage.local.remove("pauseFromIdle");
+        chrome.storage.local.get("storedAlarm", alarm => {
+            if (alarm.storedAlarm === undefined) {
+                chrome.alarms.getAll(alarms => {
+                    if (alarms.length === 0) {
+                        scheduleAlarm("work");
+                    }
+                });
+            }
+        });
+        createWindow();
     });
-    createWindow();
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -238,8 +238,7 @@ chrome.idle.onStateChanged.addListener((state) => {
             // TODO: Set an alarm to invalidate the stored alarm after a full break of time.
             chrome.storage.local.set({ pauseFromIdle: true});
         });
-    }
-    if (state === "active") {
+    } else if (state === "active") {
         chrome.storage.local.get(["pauseFromIdle"], data => {
             if (data.pauseFromIdle) {
                 chrome.storage.local.set({ pauseFromIdle: false});

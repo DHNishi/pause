@@ -20,6 +20,7 @@ The planned features of this app are as follows:
   * Pass TSLint on all files. (Done.)
   * Clean up the less files to be more idiomatic.
 10. Release to the Chrome app store.
+11. Change user-facing strings to be internationalizable instead of hacking together messages.json as {}. 
 
 The stretch features of this app are as follows:
 

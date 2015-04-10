@@ -3,9 +3,10 @@
   "description": "pause is a time manager which tells you when to focus and when to take a break.",
   "version": "0.1",
   "manifest_version": 2,
+  "default_locale": "en",
   "app": {
     "background": {
-      "scripts": ["background.js", "components/moment/moment.js", "scripts/TimerHelpers.js"],
+      "scripts": ["components/moment/moment.js", "scripts/TimerHelpers.js", "background.js"],
       "persistent": false
     }
   },
