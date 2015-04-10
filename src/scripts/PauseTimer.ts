@@ -30,8 +30,10 @@ class Pomotimer {
 
             if (alarm.name === "work") {
                 $("#startNow").text("Begin Break Early");
+                $("#restartNow").text("Restart Work Countdown");
             } else if (alarm.name === "break") {
                 $("#startNow").text("Begin Work Early");
+                $("#restartNow").text("Restart Break Countdown");
             } else {
                 return;
             }

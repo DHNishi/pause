@@ -15,7 +15,11 @@ html
         div.timeContainer
             h1#time No Alarm Set
         div#buttons
-            button.btn.waves-effect.waves-light#startNow Begin Work Early
+            div.dropdown-options
+                button.btn.waves-effect.waves-light#startNow Begin Work Early
+                ul.dropdown-options-menu#startDropdown
+                    li
+                        a.btn.waves-effect.waves-light#restartNow Restart Break Countdown
             div.dropdown-options
                 button.btn.waves-effect.waves-light#pauseButton Pause
                 ul.dropdown-options-menu#pauseDropdown

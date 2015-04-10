@@ -21,6 +21,20 @@ function startNextNow() {
     });
 }
 
+function restartCurrentAlarm() {
+    chrome.alarms.getAll((alarmArray : any[]) =>
+    {
+        if (alarmArray.length) {
+            var currentAlarm = alarmArray[0];
+            if (currentAlarm.name === "work") {
+                chrome.runtime.sendMessage('scheduleWork');
+                return;
+            }
+        }
+        chrome.runtime.sendMessage('scheduleBreak');
+    });
+}
+
 function forceWorkStart(minutes?) {
     chrome.runtime.sendMessage({
         message: "scheduleAlarm",

@@ -5,8 +5,8 @@
 /// <reference path="PauseTimer.ts" />
 /// <reference path="TimerHelpers.ts" />
 
-var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 170;
-var WINDOW_HEIGHT_SETTINGS_VISIBLE = 390;
+var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 210;
+var WINDOW_HEIGHT_SETTINGS_VISIBLE = 430;
 
 var MIN_WORK_SLIDER = 1;
 var MAX_WORK_SLIDER = 120;
@@ -80,6 +80,7 @@ function setSliderMinutes(sliderType, value) {
 function startAPause() {
     console.log("start a pause");
     $("#startNow").prop("disabled", true);
+    $("#startDropdown").addClass("disabled");
     $("#pauseButton").text("Unpause");
     $("#time").addClass("paused").text("Paused");
     setPauseTime();
@@ -101,6 +102,7 @@ function setPauseTime() {
 
 function comingBackFromAPause() {
     $("#startNow").prop("disabled", false);
+    $("#startDropdown").removeClass("disabled");
     $("#pauseButton").text("Pause");
     $("#time").text("Unpausing...").removeClass("duration").removeClass("paused");
 }
@@ -121,6 +123,9 @@ window.onload = () => {
 
     document.getElementById("startNow").onclick = () => {
         startNextNow();
+    };
+    document.getElementById("restartNow").onclick = () => {
+        restartCurrentAlarm();
     };
 
     document.getElementById("openSettings").onclick = showSettingsPage;
