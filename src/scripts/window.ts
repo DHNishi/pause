@@ -6,7 +6,7 @@
 /// <reference path="TimerHelpers.ts" />
 
 var WINDOW_HEIGHT_SETTINGS_NOT_VISIBLE = 210;
-var WINDOW_HEIGHT_SETTINGS_VISIBLE = 430;
+var WINDOW_HEIGHT_SETTINGS_VISIBLE = 450;
 
 var MIN_WORK_SLIDER = 1;
 var MAX_WORK_SLIDER = 120;
@@ -27,6 +27,13 @@ function showSettingsPage() {
         $("#clearAlarmsCheckbox").prop("checked", clearAlarms);
         $("#clearAlarmsCheckbox").click(() => {
             chrome.storage.sync.set({clearAlarmsOnClose: $("#clearAlarmsCheckbox")[0].checked});
+        });
+
+        var showDisruptor = data.showDisruptor;
+        showDisruptor = (showDisruptor === undefined) ? true : showDisruptor;
+        $("#showDisruptorCheckbox").prop("checked", showDisruptor);
+        $("#showDisruptorCheckbox").click(() => {
+            chrome.storage.sync.set({showDisruptor: $("#showDisruptorCheckbox")[0].checked});
         });
 
         $("#settings").toggle();

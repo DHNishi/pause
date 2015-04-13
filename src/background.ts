@@ -28,6 +28,7 @@ function initializeStorageDefaults(callback) {
         "remindOnClose",
         "clearAlarmsOnClose",
         "times",
+        "showDisruptor"
     ], (data) => {
         if (data.remindOnClose === undefined) {
             chrome.storage.sync.set({remindOnClose: true});
@@ -40,6 +41,9 @@ function initializeStorageDefaults(callback) {
                 break: DEFAULT_BREAK_MINUTES
             };
             chrome.storage.sync.set({times: times});
+        }
+        if (data.showDisruptor === undefined) {
+            chrome.storage.sync.set({showDisruptor: true});
         }
         callback();
     });
@@ -71,21 +75,25 @@ var createWindow = () => {
 };
 
 var createDisruptor = () => {
-    var disruptorWindow = chrome.app.window.get("disruptor");
-    if (disruptorWindow === null) {
-        chrome.app.window.create("disruptor.html", {
-            id: "disruptor",
-            "bounds": {
-                "width": DISRUPTOR_WIDTH,
-                "height": DISRUPTOR_HEIGHT
-            },
-            "resizable": false
-        }, (appWindow) => {
-            appWindow.maximize();
-        });
-    } else {
-        disruptorWindow.show();
-    }
+    chrome.storage.sync.get("showDisruptor", (data) => {
+       if (data.showDisruptor) {
+           var disruptorWindow = chrome.app.window.get("disruptor");
+           if (disruptorWindow === null) {
+               chrome.app.window.create("disruptor.html", {
+                   id: "disruptor",
+                   "bounds": {
+                       "width": DISRUPTOR_WIDTH,
+                       "height": DISRUPTOR_HEIGHT
+                   },
+                   "resizable": false
+               }, (appWindow) => {
+                   appWindow.maximize();
+               });
+           } else {
+               disruptorWindow.show();
+           }
+       }
+    });
 };
 
 function remindRunningAlarmsNotification() {
